@@ -297,6 +297,34 @@ namespace ParkAir___Assignment
 
       Console.SetCursorPosition(0, 0);
       Console.WriteLine($"{string.Join('\n', screenLines)}");
+      try
+      {
+        Console.SetCursorPosition(0, screenLines.Count + _debug.Count);
+      }
+      catch
+      {
+      
+        //Console.WindowHeight = screenLines.Count + _debug.Count;
+      
+        Console.Clear();
+        Console.WriteLine("Window is too small to contain the UI, please expand it.");
+        while (true)
+        {
+          Thread.Sleep(100);
+          try
+          {
+            Console.SetCursorPosition(0, screenLines.Count + _debug.Count);
+            Console.SetCursorPosition(0, 0);
+            Console.WriteLine($"{string.Join('\n', screenLines)}");
+            Console.SetCursorPosition(0, screenLines.Count + _debug.Count);
+            break;
+          }
+          catch
+          {
+            // ignored
+          }
+        }
+      }
     }
 
     /// <summary>

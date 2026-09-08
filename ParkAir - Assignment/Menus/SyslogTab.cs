@@ -66,9 +66,9 @@ namespace ParkAir___Assignment.Menus
       {
         var color = new Color().FromSetting(
           (string)this._settings.Settings.SelectToken(
-            $"Colors.{this._color[log.priority - log.priority / 8 * 8]}.Selected"));
+            $"Colors.{this._color[log.severity]}.Selected"));
         screenReturn +=
-          $"│ {log.timestamp.ToLongTimeString()} │{color} {$"[{this._color[log.priority - log.priority / 8 * 8].ToUpper()}]",-15}\x1b[0m │ {log.sysString}\x1b[0m\n";
+          $"│ {log.timestamp.ToLongTimeString()} │{color} {$"[{this._color[log.severity].ToUpper()}]",-15}\x1b[0m │ {log.sysString}\x1b[0m\n";
         _gui._debug[2] = log.sysString;
       }
 
