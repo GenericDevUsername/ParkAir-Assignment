@@ -1,18 +1,19 @@
-﻿using System.IO;
-using System.Security.Cryptography;
-using System.Text;
-using System.Text.Json.Nodes;
+﻿using System.Text;
 using Newtonsoft.Json.Linq;
+using ParkAir___Assignment.Menus;
 
 namespace ParkAir___Assignment
 {
   internal class Program
   {
-    static void Main(string[] args)
+    private static void Main()
     {
-      Startup();
+      Console.WriteLine("Initialising...");
+      var dir = Directory.GetCurrentDirectory();
 
-      GUI menuHandler = new();
+      Gui menuHandler = new();
+      menuHandler.AddTab(InitSettings($"{dir}/settings.json"));
+
       menuHandler.Start();
       while (true)
       {
@@ -20,12 +21,9 @@ namespace ParkAir___Assignment
       }
     }
 
-    static void Startup()
+    private static SettingsTab InitSettings(string fp)
     {
-      Console.WriteLine("Initialising...");
-      string dir = Directory.GetCurrentDirectory();
-
-      if (!File.Exists($"{dir}/settings.json"))
+      if (!File.Exists(fp))
       {
         Console.WriteLine("Generating Settings File...");
 
@@ -33,85 +31,85 @@ namespace ParkAir___Assignment
         {
           FirstLaunch = true,
           Network = new
+          {
+            ListeningType = new
             {
-              ListeningType = new
-              {
-                InputType = "SingleSelect",
-                Options = new List<string> { "TCP", "UDP", "BOTH" },
-                Selected = "BOTH",
-                Default = "BOTH"
-              },
-              IpType = new
-              {
-                InputType = "SingleSelect",
-                Options = new List<string> { "IPV4", "IPV6", "BOTH" },
-                Selected = "BOTH",
-                Default = "BOTH",
-              },
-              ListeningIp = new
-              {
-                InputType = "IP",
-                Selected = "LocalHost",
-                Default = "LocalHost"
-              },
-              ListeningPort = new
-              {
-                InputType = "Port",
-                Selected = "514",
-                Default = "514"
-              }
+              InputType = "SingleSelect",
+              Options = new List<string> { "TCP", "UDP", "BOTH" },
+              Selected = "BOTH",
+              Default = "BOTH"
             },
-            Colors = new
+            IpType = new
             {
-              Emergency = new
-              {
-                InputType = "Color",
-                Selected = "DarkBlue",
-                Default = "DarkBlue"
-              },
-              Alert = new
-              {
-                InputType = "Color",
-                Selected = "DarkBlue",
-                Default = "DarkBlue"
-              },
-              Critical = new
-              {
-                InputType = "Color",
-                Selected = "DarkBlue",
-                Default = "DarkBlue"
-              },
-              Error = new
-              {
-                InputType = "Color",
-                Selected = "Red",
-                Default = "Red"
-              },
-              Warning = new
-              {
-                InputType = "Color",
-                Selected = "Yellow",
-                Default = "Yellow"
-              },
-              Notice = new
-              {
-                InputType = "Color",
-                Selected = "Yellow",
-                Default = "Yellow"
-              },
-              Informational = new
-              {
-                InputType = "Color",
-                Selected = "Black",
-                Default = "Black"
-              },
-              Debug = new
-              {
-                InputType = "Color",
-                Selected = "DarkBlue",
-                Default = "DarkBlue"
-              }
+              InputType = "SingleSelect",
+              Options = new List<string> { "IPV4", "IPV6", "BOTH" },
+              Selected = "BOTH",
+              Default = "BOTH"
+            },
+            ListeningIp = new
+            {
+              InputType = "IP",
+              Selected = "LocalHost",
+              Default = "LocalHost"
+            },
+            ListeningPort = new
+            {
+              InputType = "Port",
+              Selected = "514",
+              Default = "514"
             }
+          },
+          Colors = new
+          {
+            Emergency = new
+            {
+              InputType = "Color",
+              Selected = "DarkBlue",
+              Default = "DarkBlue"
+            },
+            Alert = new
+            {
+              InputType = "Color",
+              Selected = "DarkBlue",
+              Default = "DarkBlue"
+            },
+            Critical = new
+            {
+              InputType = "Color",
+              Selected = "DarkBlue",
+              Default = "DarkBlue"
+            },
+            Error = new
+            {
+              InputType = "Color",
+              Selected = "Red",
+              Default = "Red"
+            },
+            Warning = new
+            {
+              InputType = "Color",
+              Selected = "Yellow",
+              Default = "Yellow"
+            },
+            Notice = new
+            {
+              InputType = "Color",
+              Selected = "Yellow",
+              Default = "Yellow"
+            },
+            Informational = new
+            {
+              InputType = "Color",
+              Selected = "Black",
+              Default = "Black"
+            },
+            Debug = new
+            {
+              InputType = "Color",
+              Selected = "DarkBlue",
+              Default = "DarkBlue"
+            }
+          }
         });
 
         //Console.WriteLine(settingsTemplate.ToString());
@@ -119,9 +117,9 @@ namespace ParkAir___Assignment
         try
         {
           // Create the file, or overwrite if the file exists.
-          using (FileStream fs = File.Create($"{dir}/settings.json"))
+          using (FileStream fs = File.Create(fp))
           {
-            byte[] info = new UTF8Encoding(true).GetBytes(settingsTemplate.ToString());
+            var info = new UTF8Encoding(true).GetBytes(settingsTemplate.ToString());
             // Add some information to the file.
             fs.Write(info, 0, info.Length);
           }
@@ -134,6 +132,8 @@ namespace ParkAir___Assignment
           Console.WriteLine(ex.ToString());
         }
       }
+      SettingsTab settingsTab = new(fp);
+      return settingsTab;
     }
   }
 }
