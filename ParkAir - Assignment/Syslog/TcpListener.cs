@@ -1,8 +1,9 @@
-﻿namespace ParkAir___Assignment.Syslog;
-
-internal class TcpListener
+﻿namespace ParkAir___Assignment.Syslog
 {
-  public void Stop()
+  internal class TcpListener
   {
+    public void Stop()
+    {
+    }
   }
 }

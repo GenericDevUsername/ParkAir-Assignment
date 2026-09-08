@@ -2,173 +2,182 @@
 using ParkAir___Assignment.Menus;
 using System.Text;
 
-namespace ParkAir___Assignment;
-
-internal static class Program
+namespace ParkAir___Assignment
 {
-  private static void Main()
+  internal static class Program
   {
-    Console.WriteLine("Initialising...");
-    
-    ///// INITIALIZE CONSOLE FOR UTF-8 & ANSI SUPPORT /////
-    Console.OutputEncoding = Encoding.UTF8;
-    AnsiConsole.Initialize();
-    
-    // get current working directory
-    string dir = Directory.GetCurrentDirectory();
-
-    ///// SETUP UI CLASS /////
-    Gui menuHandler = new("Park Air Syslog");
-    SettingsTab settingsConfig = InitSettings($"{dir}/settings.json");
-    // add menus (tabs)
-    menuHandler.AddTab(settingsConfig);
-    menuHandler.AddTab(new SyslogTab(settingsConfig));
-    
-    // start the menu background thread
-    menuHandler.Start();
-  }
-
-  private static SettingsTab InitSettings(string fp)
-  {
-    ///// SETUP SETTINGS MENU REQUIREMENTS /////
-    
-    if (!File.Exists(fp)) // if the settings file doesn't exist create it with default values
+    /// <summary>
+    /// The main function, runs on start and sets up the program to run
+    /// </summary>
+    private static void Main()
     {
-      Console.WriteLine("Generating Settings File...");
-      
-      // settings json
-      JObject settingsTemplate = JObject.FromObject(new
-      {
-        FirstLaunch = true,
-        Network = new
-        {
-          ListeningType = new
-          {
-            Name = "Listening Type",
-            InputType = "SingleSelect",
-            OptionGap = 2,
-            Options = new List<string> { "TCP", "UDP", "BOTH" },
-            Selected = "BOTH",
-            Default = "BOTH",
-            RequiresRestart = true
-          },
-          IpType = new
-          {
-            Name = "Ip Type",
-            InputType = "SingleSelect",
-            OptionGap = 1,
-            Options = new List<string> { "IPV4", "IPV6", "BOTH" },
-            Selected = "BOTH",
-            Default = "BOTH",
-            RequiresRestart = true
-          },
-          ListeningIp = new
-          {
-            Name = "Listening IP",
-            InputType = "IP",
-            Selected = "127.0.0.1",
-            Default = "127.0.0.1",
-            RequiresRestart = true
-          },
-          ListeningPort = new
-          {
-            Name = "Listening Port",
-            InputType = "Port",
-            Selected = "514",
-            Default = "514",
-            RequiresRestart = true
-          }
-        },
-        Colors = new
-        {
-          Emergency = new
-          {
-            Name = "Emergency",
-            InputType = "Color",
-            Selected = "DARK_BLUE",
-            Default = "DARK_BLUE",
-            RequiresRestart = false
-          },
-          Alert = new
-          {
-            Name = "Alert",
-            InputType = "Color",
-            Selected = "DARK_BLUE",
-            Default = "DARK_BLUE",
-            RequiresRestart = false
-          },
-          Critical = new
-          {
-            Name = "Critical",
-            InputType = "Color",
-            Selected = "DARK_BLUE",
-            Default = "DARK_BLUE",
-            RequiresRestart = false
-          },
-          Error = new
-          {
-            Name = "Color",
-            InputType = "Color",
-            Selected = "DARK_RED",
-            Default = "DARK_RED",
-            RequiresRestart = false
-          },
-          Warning = new
-          {
-            Name = "Warning",
-            InputType = "Color",
-            Selected = "DARK_YELLOW",
-            Default = "DARK_YELLOW",
-            RequiresRestart = false
-          },
-          Notice = new
-          {
-            Name = "Notice",
-            InputType = "Color",
-            Selected = "DARK_YELLOW",
-            Default = "DARK_YELLOW",
-            RequiresRestart = false
-          },
-          Informational = new
-          {
-            Name = "Informational",
-            InputType = "Color",
-            Selected = "BLACK",
-            Default = "BLACK",
-            RequiresRestart = false
-          },
-          Debug = new
-          {
-            Name = "Debug",
-            InputType = "Color",
-            Selected = "DARK_BLUE",
-            Default = "DARK_BLUE",
-            RequiresRestart = false
-          }
-        }
-      });
+      Console.WriteLine("Initialising...");
 
-      try
-      {
-        // Create the file, or overwrite if the file exists.
-        using (FileStream fs = File.Create(fp))
-        {
-          // Convert the file to byes and save to the settings file
-          byte[] info = new UTF8Encoding(true).GetBytes(settingsTemplate.ToString());
-          fs.Write(info, 0, info.Length);
-        }
+      ///// INITIALIZE CONSOLE FOR UTF-8 & ANSI SUPPORT /////
+      Console.OutputEncoding = Encoding.UTF8;
+      AnsiConsole.Initialize();
 
-        Console.WriteLine("Generated Settings File...");
-      }
+      // get current working directory
+      var dir = Directory.GetCurrentDirectory();
 
-      catch (Exception ex)
-      {
-        Console.WriteLine(ex.ToString());
-      }
+      ///// SETUP UI CLASS /////
+      Gui menuHandler = new("Park Air Syslog");
+      SettingsTab settingsConfig = InitSettings($"{dir}/settings.json");
+      // add menus (tabs)
+      menuHandler.AddTab(settingsConfig);
+      menuHandler.AddTab(new SyslogTab(settingsConfig));
+
+      // start the menu background thread
+      menuHandler.Start();
     }
 
-    // create a settings tab with the settings file and return it
-    SettingsTab settingsTab = new(fp);
-    return settingsTab;
+    /// <summary>
+    /// Generates a settings tab based on a provided file path and returns a settingsTab Object.
+    /// </summary>
+    /// <param name="fp">The file path to settings.json.</param>
+    /// <returns>settingsTab - a settingsTab Object.</returns>
+    private static SettingsTab InitSettings(string fp)
+    {
+      ///// SETUP SETTINGS MENU REQUIREMENTS /////
+
+      if (!File.Exists(fp)) // if the settings file doesn't exist create it with default values
+      {
+        Console.WriteLine("Generating Settings File...");
+
+        // settings json
+        JObject settingsTemplate = JObject.FromObject(new
+        {
+          FirstLaunch = true,
+          Network = new
+          {
+            ListeningType = new
+            {
+              Name = "Listening Type",
+              InputType = "SingleSelect",
+              OptionGap = 2,
+              Options = new List<string> { "TCP", "UDP", "BOTH" },
+              Selected = "BOTH",
+              Default = "BOTH",
+              RequiresRestart = true
+            },
+            IpType = new
+            {
+              Name = "Ip Type",
+              InputType = "SingleSelect",
+              OptionGap = 1,
+              Options = new List<string> { "IPV4", "IPV6", "BOTH" },
+              Selected = "BOTH",
+              Default = "BOTH",
+              RequiresRestart = true
+            },
+            ListeningIp = new
+            {
+              Name = "Listening IP",
+              InputType = "IP",
+              Selected = "127.0.0.1",
+              Default = "127.0.0.1",
+              RequiresRestart = true
+            },
+            ListeningPort = new
+            {
+              Name = "Listening Port",
+              InputType = "Port",
+              Selected = "514",
+              Default = "514",
+              RequiresRestart = true
+            }
+          },
+          Colors = new
+          {
+            Emergency = new
+            {
+              Name = "Emergency",
+              InputType = "Color",
+              Selected = "DARK_BLUE",
+              Default = "DARK_BLUE",
+              RequiresRestart = false
+            },
+            Alert = new
+            {
+              Name = "Alert",
+              InputType = "Color",
+              Selected = "DARK_BLUE",
+              Default = "DARK_BLUE",
+              RequiresRestart = false
+            },
+            Critical = new
+            {
+              Name = "Critical",
+              InputType = "Color",
+              Selected = "DARK_BLUE",
+              Default = "DARK_BLUE",
+              RequiresRestart = false
+            },
+            Error = new
+            {
+              Name = "Color",
+              InputType = "Color",
+              Selected = "DARK_RED",
+              Default = "DARK_RED",
+              RequiresRestart = false
+            },
+            Warning = new
+            {
+              Name = "Warning",
+              InputType = "Color",
+              Selected = "DARK_YELLOW",
+              Default = "DARK_YELLOW",
+              RequiresRestart = false
+            },
+            Notice = new
+            {
+              Name = "Notice",
+              InputType = "Color",
+              Selected = "DARK_YELLOW",
+              Default = "DARK_YELLOW",
+              RequiresRestart = false
+            },
+            Informational = new
+            {
+              Name = "Informational",
+              InputType = "Color",
+              Selected = "BLACK",
+              Default = "BLACK",
+              RequiresRestart = false
+            },
+            Debug = new
+            {
+              Name = "Debug",
+              InputType = "Color",
+              Selected = "DARK_BLUE",
+              Default = "DARK_BLUE",
+              RequiresRestart = false
+            }
+          }
+        });
+
+        try
+        {
+          // Create the file, or overwrite if the file exists.
+          using (FileStream fs = File.Create(fp))
+          {
+            // Convert the file to byes and save to the settings file
+            var info = new UTF8Encoding(true).GetBytes(settingsTemplate.ToString());
+            fs.Write(info, 0, info.Length);
+          }
+
+          Console.WriteLine("Generated Settings File...");
+        }
+
+        catch (Exception ex)
+        {
+          Console.WriteLine(ex.ToString());
+        }
+      }
+
+      // create a settings tab with the settings file and return it
+      SettingsTab settingsTab = new(fp);
+      return settingsTab;
+    }
   }
 }
