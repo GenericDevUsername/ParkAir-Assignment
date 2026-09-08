@@ -33,16 +33,16 @@ namespace ParkAir___Assignment.Syslog
       switch (this._listeningType)
       {
         case "UDP":
-          RunUdp();
+          this.t_UdpListenerThread.Start();
           break;
         
         case "TCP":
-          RunTcp();
+          this.t_TcpListenerThread.Start();
           break;
         
         case "BOTH":
-          RunTcp();
-          RunUdp();
+          this.t_UdpListenerThread.Start();
+          this.t_TcpListenerThread.Start();
           break;
       }
     }
