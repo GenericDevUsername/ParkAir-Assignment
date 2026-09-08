@@ -208,7 +208,7 @@ public class Gui
     for (int i = 0; i < screenLines.Count; i++)
       screenLines[i] = $"{screenLines[i]}{new string(' ', (Console.BufferWidth - screenLines[i].Length < 0 ? 0 : Console.BufferWidth - screenLines[i].Length ))}";
       
-    for (int i = 0; i < this._debug.Count + this._lines; i++)
+    for (int i = 0; i < this._debug.Count + this._lines - newLines; i++)
       screenLines.Add($"{new string(' ', Console.BufferWidth)}");
 
     this._lines = newLines;
