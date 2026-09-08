@@ -7,6 +7,11 @@ namespace ParkAir___Assignment.Menus.SettingsHandlers;
 public class Setting
 {
     public int Line = 0;
+    public string Name { get; }
+    public string InputType { get; }
+
+    private SettingsCategory Category { get; }
+    public JObject? Value { get; }
 
     public Setting(SettingsCategory category, KeyValuePair<string, JToken?> setting, int selectionIndex)
     {
@@ -18,11 +23,6 @@ public class Setting
         Value.PropertyChanged += Value_PropertyChanged;
     }
 
-    public string Name { get; }
-    public string InputType { get; }
-
-    private SettingsCategory Category { get; }
-    public JObject? Value { get; }
 
     private void Value_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
