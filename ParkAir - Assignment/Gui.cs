@@ -5,7 +5,7 @@ namespace ParkAir___Assignment
 {
   public class Gui
   {
-    private readonly List<ITab> _tabs = new();
+    public List<ITab> Tabs { get; private set; } = new();
     private int _tabIndex;
     private Task? _inputTaskHandler;
     public bool Cursor = false;
@@ -16,7 +16,7 @@ namespace ParkAir___Assignment
     public void AddTab(ITab tab)
     {
       tab.Register(this);
-      this._tabs.Add(tab);
+      this.Tabs.Add(tab);
     }
 
     public void Start()
@@ -51,6 +51,7 @@ namespace ParkAir___Assignment
 
       // Position cursor at provided location
       bool intercept = true;
+      bool cancel = false;
       string errorMsg = "";
       while (intercept)
       {
@@ -74,7 +75,12 @@ namespace ParkAir___Assignment
           continue;
         }
         ConsoleKeyInfo key = Console.ReadKey(true);
-        if (key.Key == ConsoleKey.Enter)
+        if (key.Key == ConsoleKey.Backspace)
+        {
+          intercept = false;
+          cancel = true;
+        }
+        else if (key.Key == ConsoleKey.Enter)
         {
           if ((min is not null ? inputOutput.Length > min : true) && (max is not null ? inputOutput.Length <= max : true) && (length >= 0 ? inputOutput.Length <= length : true) && (regexCheck is not null ? regexCheck.Matches(inputOutput).Count > 0 : true))
           {
@@ -126,7 +132,7 @@ namespace ParkAir___Assignment
 
 
       Console.CursorVisible = currentCursorVisibility;
-      return inputOutput;
+      return cancel ? prefill : inputOutput;
     }
 
     private string GenerateTabs(Gui gui)
@@ -135,38 +141,38 @@ namespace ParkAir___Assignment
       string tabMiddle = "";
       string tabBottom = "";
 
-      if (gui._tabs.Count > 1)
+      if (gui.Tabs.Count > 1)
       {
         tabTop += "┌";
         tabMiddle += "│";
         tabBottom += "├";
-        foreach (ITab tab in this._tabs)
+        foreach (ITab tab in this.Tabs)
         {
-          tabTop += $"{new string('─', tab.TabName.Length + 4)}{(tab == this._tabs[^1] ? "┐" : "┬")}";
+          tabTop += $"{new string('─', tab.TabName.Length + 4)}{(tab == this.Tabs[^1] ? "┐" : "┬")}";
           tabMiddle += 
-            $" {(this._tabs[this._tabIndex] == tab ? $"{(this._tabs[this._tabIndex].Tabber ? "[" : "\x1b[90m[\x1b[0m")}" : " ")}{tab.TabName}{(this._tabs[this._tabIndex] == tab ? $"{(this._tabs[this._tabIndex].Tabber ? "]" : "\x1b[90m]\x1b[0m")}" : " ")} │";
+            $" {(this.Tabs[this._tabIndex] == tab ? $"{(this.Tabs[this._tabIndex].Tabber ? "[" : "\x1b[90m[\x1b[0m")}" : " ")}{tab.TabName}{(this.Tabs[this._tabIndex] == tab ? $"{(this.Tabs[this._tabIndex].Tabber ? "]" : "\x1b[90m]\x1b[0m")}" : " ")} │";
           tabBottom += $"{new string('─', tab.TabName.Length + 4)}┴";
-          if (tab == this._tabs[this._tabs.Count - 1 < 0 ? 0 : this._tabs.Count - 1] &&
-              tabBottom.Length - (this._tabs[this._tabIndex].Tabber ? 0 : 9) < 92)
+          if (tab == this.Tabs[this.Tabs.Count - 1 < 0 ? 0 : this.Tabs.Count - 1] &&
+              tabBottom.Length - (this.Tabs[this._tabIndex].Tabber ? 0 : 9) < 92)
           {
             int lineCount = 92 - tabBottom.Length < 0 ? 0 : 92 - tabBottom.Length;
             tabBottom = $"{tabBottom.Remove(tabBottom.Length - 1, 1)}{new string('─', lineCount)}┐";
             char[] lineThreeArray = tabBottom.ToCharArray();
-            lineThreeArray[tabMiddle.Length - (this._tabs[this._tabIndex].Tabber ? 0 : 18) - 1] = '┴';
+            lineThreeArray[tabMiddle.Length - (this.Tabs[this._tabIndex].Tabber ? 0 : 18) - 1] = '┴';
             tabBottom = new(lineThreeArray);
           }
-          else if (tab == this._tabs[this._tabs.Count - 1 < 0 ? 0 : this._tabs.Count - 1] &&
-                   tabBottom.Length - (this._tabs[this._tabIndex].Tabber ? 0 : 9) == 92)
+          else if (tab == this.Tabs[this.Tabs.Count - 1 < 0 ? 0 : this.Tabs.Count - 1] &&
+                   tabBottom.Length - (this.Tabs[this._tabIndex].Tabber ? 0 : 9) == 92)
           {
             tabBottom = $"{tabBottom.Remove(tabBottom.Length - 1, 1)}┤";
           }
-          else if (tab == this._tabs[this._tabs.Count - 1 < 0 ? 0 : this._tabs.Count - 1] &&
-                   tabBottom.Length - (this._tabs[this._tabIndex].Tabber ? 0 : 9) > 92)
+          else if (tab == this.Tabs[this.Tabs.Count - 1 < 0 ? 0 : this.Tabs.Count - 1] &&
+                   tabBottom.Length - (this.Tabs[this._tabIndex].Tabber ? 0 : 9) > 92)
           {
             tabBottom = $"{tabBottom.Remove(tabBottom.Length - 1, 1)}┘";
             char[] lineThreeArray = tabBottom.ToCharArray();
             char[] lineTwoArray = tabMiddle.ToCharArray();
-            lineThreeArray[91] = lineTwoArray[this._tabs[this._tabIndex].Tabber ? 91 : 96] == '│' ? '┼' : '┬';
+            lineThreeArray[91] = lineTwoArray[this.Tabs[this._tabIndex].Tabber ? 91 : 96] == '│' ? '┼' : '┬';
             tabBottom = new(lineThreeArray);
           }
         }
@@ -184,7 +190,7 @@ namespace ParkAir___Assignment
     private void ScreenUpdate()
     {
       var tabs = GenerateTabs(this);
-      var screen = $"{tabs}\n{this._tabs[this._tabIndex].Screen()}";
+      var screen = $"{tabs}\n{this.Tabs[this._tabIndex].Screen()}";
 
       Console.SetCursorPosition(0, 0);
       Console.WriteLine(screen + $"\n{string.Join('\n', this._debug.ToArray())}");
@@ -198,7 +204,7 @@ namespace ParkAir___Assignment
 
     private void HandleKeypress(ConsoleKeyInfo key)
     {
-      if (this._tabs[this._tabIndex].Tabber)
+      if (this.Tabs[this._tabIndex].Tabber)
         switch (key.Key)
         {
           case ConsoleKey.LeftArrow:
@@ -206,12 +212,12 @@ namespace ParkAir___Assignment
             break;
 
           case ConsoleKey.RightArrow:
-            this._tabIndex = this._tabIndex + 1 == this._tabs.Count ? this._tabIndex : this._tabIndex + 1;
+            this._tabIndex = this._tabIndex + 1 == this.Tabs.Count ? this._tabIndex : this._tabIndex + 1;
             break;
         }
 
       Console.CursorVisible = this.Cursor;
-      if (this._tabs.Count > 0) this._tabs[this._tabIndex].HandleKeypress(key);
+      if (this.Tabs.Count > 0) this.Tabs[this._tabIndex].HandleKeypress(key);
 
       // DEBUG STRING UPDATER - REMOVE LATER
       if (this._debug[0] == key.Key.ToString())

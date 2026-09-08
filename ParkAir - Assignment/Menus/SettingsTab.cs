@@ -189,7 +189,7 @@ namespace ParkAir___Assignment.Menus
 
         case "Color":
           valueDisplay =
-            $"{(string?)setting.Value["Selected"]}{new('_', 21 - ((string?)setting.Value["Selected"]).Length)}[{new Color().FromSetting((string?)setting.Value["Selected"])}▓▓▓\x1b[0m]";
+            $"{(string?)setting.Value["Selected"]}{new(' ', 21 - ((string?)setting.Value["Selected"]).Length)}[{new Color().FromSetting((string?)setting.Value["Selected"])}▓▓▓\x1b[0m]";
           offset += new Color().FromSetting((string?)setting.Value["Selected"]).Length + 4;
           break;
       }
@@ -201,7 +201,7 @@ namespace ParkAir___Assignment.Menus
     public string Screen()
     {
       List<string> screenLines = new();
-      int line = 3;
+      int line = this._gui.Tabs.Count > 1 ? 3 : 1;
       foreach (SettingsCategory category in this._settings)
       {
         screenLines.Add($"│{category.Name}:{new(' ', 89 - category.Name.Length)}│");

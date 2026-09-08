@@ -16,10 +16,6 @@ namespace ParkAir___Assignment
 
       Gui menuHandler = new();
       menuHandler.AddTab(InitSettings($"{dir}/settings.json"));
-      menuHandler.AddTab(InitSettings($"{dir}/settings.json"));
-      menuHandler.AddTab(InitSettings($"{dir}/settings.json"));
-      menuHandler.AddTab(InitSettings($"{dir}/settings.json"));
-      menuHandler.AddTab(InitSettings($"{dir}/settings.json"));
       
       menuHandler.Start();
       while (true)
