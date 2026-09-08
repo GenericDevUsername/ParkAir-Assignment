@@ -6,7 +6,7 @@ namespace ParkAir___Assignment;
 public class Gui
 {
   private const bool CURSOR = false;
-  private readonly List<string> _debug = new() { "", "", "", "" };
+  private readonly List<string> _debug = new() { "", "" };
   private Task? _inputTaskHandler;
   private int _lines;
   internal int _tabIndex;
@@ -42,9 +42,10 @@ public class Gui
   /// </summary>
   private void RunMenu()
   {
-    Console.Clear();
     _inputTaskHandler = new Task(InputHandler);
     _inputTaskHandler.Start();
+    ScreenUpdate();
+    Console.Clear();
     ScreenUpdate();
     while (true)
     {
@@ -313,7 +314,7 @@ public class Gui
     catch
     {
 
-      //Console.WindowHeight = screenLines.Count + _debug.Count;
+      Console.WindowHeight = screenLines.Count + _debug.Count;
 
       Console.Clear();
       Console.WriteLine("Window is too small to contain the UI, please expand it.");
