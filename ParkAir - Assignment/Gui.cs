@@ -6,7 +6,7 @@ namespace ParkAir___Assignment
   public class Gui
   {
     private const bool CURSOR = false;
-    internal readonly List<string> _debug = new() { "", "", "" };
+    internal readonly List<string> _debug = new() { "", "", "", "" };
     private Task? _inputTaskHandler;
     private int _lines;
     internal int _tabIndex;
@@ -88,11 +88,12 @@ namespace ParkAir___Assignment
       var currentCursorVisibility = Console.CursorVisible;
       if (top == -1 || left == -1) (left, top) = Console.GetCursorPosition();
       if (length == -1) length = Console.WindowWidth - (left >= 0 ? left : 0);
+      
 
       // Pre define variables based on above information
       // (if a prefill is provided we must start the function at a point where it appears this input has already been typed in)
       var inputOutput = prefill == "" ? "" : prefill;
-      var currentIndex = prefill == "" ? 0 : prefill.Length - 1;
+      var currentIndex = (prefill == "" ? -1 : prefill.Length - 1);
 
       // Check if the prefill already surpasses the provided max char count, If it does throw an error
       if (max is not null && max < prefill.Length)
@@ -129,8 +130,7 @@ namespace ParkAir___Assignment
             else Console.WriteLine($"\u001b[100;97mAnd {resultsList.Count - i + 1} more...\u001b[0m");
           }
         }
-
-        Console.Write(" ");
+        
         // update indexes
         var maxIndex = inputOutput.Length;
 
@@ -354,7 +354,8 @@ namespace ParkAir___Assignment
       if (Tabs.Count > 0) Tabs[this._tabIndex].HandleKeypress(key);
 
       // DEBUG STRING UPDATER - REMOVE LATER
-      if (this._debug[0] == key.Key.ToString())
+      // (Keeping this in my assignment so you can see the keys being handled)
+      if (this._debug[0] == $"{key.Key.ToString()}          ")
       {
         var temp = Convert.ToInt32(this._debug[1].Replace(" ", "").Remove(0, 1));
         temp++;

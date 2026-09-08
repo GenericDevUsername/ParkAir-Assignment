@@ -19,8 +19,10 @@ namespace ParkAir___Assignment.Menus
       { 7, "Debug" }
     };
 
+    private bool _pause = false;
+
     private string _ipfilter = "";
-    private string _severityFilter = "";
+    private int _severityFilter = -1;
     private int _resetter;
 
     private int _selectint = -1;
@@ -44,6 +46,11 @@ namespace ParkAir___Assignment.Menus
       this.t_backgroundListenerThread = new(ScreenRefresh);
       this.t_backgroundListenerThread.Start();
     }
+    
+    private static int Mod(int k, int n)
+    {
+      return (k %= n) < 0 ? k + n : k;
+    }
 
     public string TabName { get; set; } = "Syslog";
     public string ScreenString { get; private set; } = "";
@@ -60,11 +67,30 @@ namespace ParkAir___Assignment.Menus
 
     }
 
-    private void ResetFilter()
+    private void DeleteLocalStore()
     {
-      this._ipfilter = "";
-      this._severityFilter = "";
       
+    }
+
+    private void ChangeFilter(int index, ConsoleKey action)
+    {
+      switch (index)
+      {
+        case 0:
+          this._pause = true;
+          List<SysMessage> logsList = this.sysServer.GetLogs();
+          List<string> autocompleteList = (from log in logsList select log.hostname).Distinct().ToList();
+          
+          this._ipfilter = _gui.Input(top: 3, left: 64, prefill: this._ipfilter != "" ? this._ipfilter : "",
+            spaceholder: '_', max: 26, length: 26, autocomplete: autocompleteList);
+          this._pause = false;
+          break;
+        
+        case 1:
+          this._severityFilter = Mod(this._severityFilter + (action == ConsoleKey.LeftArrow ? 0 : 2), this._color.Count+1)-1;
+          break;
+      }
+      if (_gui?.Tabs[_gui._tabIndex] == this && !this._pause) _gui?.ScreenUpdate();
     }
 
     public void HandleKeypress(ConsoleKeyInfo key)
@@ -83,22 +109,36 @@ namespace ParkAir___Assignment.Menus
         case ConsoleKey.Enter:
           if (this._selectint is >= 0 and < 3 - 1)
           {
-            //ChangeSetting(this._selectionIndex[this._selectint], key);
+            ChangeFilter(this._selectint, key.Key);
           }
-          if (this._selectint >= 3-1 && this._resetter > 0)
+          switch (this._selectint)
           {
-            this._resetter++;
-            if (this._resetter == 3)
+            case >= 3-1 when this._resetter > 0:
             {
-              ResetFilter();
-              this._resetter = 0;
+              this._resetter++;
+              if (this._resetter == 3)
+              {
+                DeleteLocalStore();
+                this._resetter = 0;
+              }
+
+              break;
             }
-          }
-          else if (this._selectint >= 3-1)
-          {
-            this._resetter++;
+            case >= 3-1:
+              this._resetter++;
+              break;
           }
 
+          break;
+          
+        case ConsoleKey.RightArrow:
+          if (this._selectint is >= 0 and < 3 - 1)
+            ChangeFilter(this._selectint, key.Key);
+          break;
+        
+        case ConsoleKey.LeftArrow:
+          if (this._selectint is >= 0 and < 3 - 1)
+            ChangeFilter(this._selectint, key.Key);
           break;
       }
       
@@ -108,13 +148,28 @@ namespace ParkAir___Assignment.Menus
     public string Screen()
     {
       List<SysMessage> logs = this.sysServer.GetLogs();
+      if (this._severityFilter >= 0)
+      {
+        logs = (from log in logs where log.severity == this._severityFilter select log).ToList();
+      }
 
+      if (this._ipfilter != "")
+      {
+        logs = (from log in logs where log.hostname.ToUpper().Contains(this._ipfilter.ToUpper()) select log).ToList();
+      }
       
       
       List<SysMessage> lastAmount = logs.Skip(Math.Max(0, logs.Count - 15)).ToList();
       var screenReturn = "";
-      screenReturn += $"│[{(this._selectint == 0 ? ">" : " ")}] Filter IP{new(' ', 85 - 9 - this._ipfilter.Length)}{this._ipfilter} │\n";
-      screenReturn += $"│[{(this._selectint == 1 ? ">" : " ")}] Filter Port{new(' ', 85 - 11 - this._ipfilter.Length)}{this._ipfilter} │\n";
+      
+      string? ipFilterString = $"{this._ipfilter}{new string('_', 26 - this._ipfilter.Length)}";
+      screenReturn += $"│[{(this._selectint == 0 ? ">" : " ")}] Filter IP{new(' ', 85 - 9 - ipFilterString.Length)}{ipFilterString} │\n";
+
+      
+      string sevcolor = $"{(this._severityFilter >= 0 ? new Color().FromSetting((string)this._settings.Settings.SelectToken($"Colors.{this._color[this._severityFilter]}.Selected")) : "")}";
+      int offset = this._severityFilter >= 0 ? sevcolor.Length + 4 : 0;
+      string sevFilterString = $"{(this._severityFilter >= 0 ? $"{sevcolor}{this._color[this._severityFilter]}\x1b[0m" : "UNSET")}";
+      screenReturn += $"│[{(this._selectint == 1 ? ">" : " ")}] Filter Type{new(' ', 83 - 11 - sevFilterString.Length + offset)}[{sevFilterString}] │\n";
       screenReturn += $"│{new string(' ', 90)}│\n";
       screenReturn +=
         $"│[{(this._selectint == 3 - 1 ? ">" : " ")}] Delete Local Store {(this._selectint == 3 - 1 ? this._resetter > 0 ? $"\x1b[31m(Press Enter {3 - this._resetter} More Time(s) to Confirm)\x1b[0m" : "(Press Enter)" : " ")}{new(' ', 85 - 19 - (this._selectint == 3 - 1 ? this._resetter > 0 ? 38 : 12 : 0))}│\n";
@@ -123,7 +178,7 @@ namespace ParkAir___Assignment.Menus
       int i = 0;
       foreach (SysMessage log in lastAmount)
       {
-        var color = new Color().FromSetting((string)this._settings.Settings.SelectToken($"Colors.{this._color[log.severity]}.Selected"));
+        string? color = new Color().FromSetting((string)this._settings.Settings.SelectToken($"Colors.{this._color[log.severity]}.Selected"));
         screenReturn += $"│ {log.timestamp.ToLongTimeString()} │{color} {$"[{this._color[log.severity].ToUpper()}]",-15}\x1b[0m │ {log.sysString}\x1b[0m\n";
         i++;
       }
@@ -147,7 +202,7 @@ namespace ParkAir___Assignment.Menus
     {
       while (true)
       {
-        if (_gui?.Tabs[_gui._tabIndex] == this) _gui?.ScreenUpdate();
+        if (_gui?.Tabs[_gui._tabIndex] == this && !this._pause) _gui?.ScreenUpdate();
         Thread.Sleep((int)3E3);
       }
     }
