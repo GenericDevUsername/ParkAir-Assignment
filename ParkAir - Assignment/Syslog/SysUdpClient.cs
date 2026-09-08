@@ -1,6 +1,5 @@
-﻿namespace ParkAir___Assignment.Syslog
+﻿namespace ParkAir___Assignment.Syslog;
+
+public class SysUdpClient
 {
-  public class SysUdpClient
-  {
-  }
 }
