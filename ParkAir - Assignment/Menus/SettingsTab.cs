@@ -11,7 +11,7 @@ namespace ParkAir___Assignment.Menus
     public JObject Settings { get; private set; }
     private List<SettingsCategory> _settings = new();
 
-    public SettingsTab(string fp)
+    public SettingsTab(string fp) 
     {
       StreamReader file = File.OpenText(fp);
       JsonTextReader reader = new(file);
