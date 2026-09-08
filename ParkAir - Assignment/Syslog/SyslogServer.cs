@@ -4,9 +4,11 @@ namespace ParkAir___Assignment.Syslog
 {
   internal class SyslogServer
   {
-    private IPAddress _listeningIP;
-    private int _listeningPort;
-    private string _listeningType;
+    internal IPAddress _listeningIP;
+    internal readonly int _listeningPort;
+    internal List<SysMessage> _log = new();
+
+    private readonly string _listeningType;
 
     private readonly Thread t_UdpListenerThread;
     private readonly Thread t_TcpListenerThread;
