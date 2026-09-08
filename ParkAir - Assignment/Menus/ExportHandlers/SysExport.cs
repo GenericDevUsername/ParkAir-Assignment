@@ -13,10 +13,9 @@ namespace ParkAir___Assignment.Menus.ExportHandlers
       DirectoryInfo d = new DirectoryInfo($"{dir}/local.store/");
 
       FileInfo[] files = d.GetFiles("logs-??.??.*.csv");
-      Console.WriteLine($"Files: {files.Length}");
+      Console.WriteLine($"Reading {files.Length} local log files...");
       foreach (FileInfo file in files)
       {
-        Console.WriteLine($"Reading: {file.Name}");
         TextFieldParser preLoad = new TextFieldParser(file.FullName);
         preLoad.TextFieldType = FieldType.Delimited;
         preLoad.SetDelimiters(",");
@@ -47,6 +46,8 @@ namespace ParkAir___Assignment.Menus.ExportHandlers
     
     public static void ExportSingle(string filetype = "TXT")
     {
+      Console.WriteLine($"Exporting with: {filetype}");
+      
       string dir = Directory.GetCurrentDirectory();
       string filename = $"export_{DateTime.Now:yyyMMddHHmmsss}";
       string tempDirectory = $"{dir}/export.tmp/{DateTime.Now:yyyMMddHHmmsss}";
@@ -78,7 +79,7 @@ namespace ParkAir___Assignment.Menus.ExportHandlers
       string moveDirectoryPath = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}/parkair_exports/";
       FileInfo moveDirectory = new(moveDirectoryPath);
       moveDirectory.Directory.Create();
-      Console.WriteLine($"Moving to: {$"{moveDirectoryPath}{filename}.{filetype.ToLower()}"}");
+      Console.WriteLine($"Saving to: {$"{moveDirectoryPath}{filename}.{filetype.ToLower()}"}");
 
       int i = 0;
       while (true)
@@ -97,12 +98,14 @@ namespace ParkAir___Assignment.Menus.ExportHandlers
       
       Directory.Delete(tempDirectory);
       Directory.Delete($"{dir}/export.tmp/");
-      Process.Start("explorer.exe", @$"/select, {moveDirectoryPath}{Path.DirectorySeparatorChar}{filename}{(i > 0 ? $" {i}" : "")}.{filetype.ToLower()}");
+      Process.Start("explorer.exe", @$"{moveDirectoryPath}{Path.DirectorySeparatorChar}{filename}{(i > 0 ? $" {i}" : "")}.{filetype.ToLower()}");
 
     }
 
     public static void ExportMulti(string filetype = "CSV")
     {
+      Console.WriteLine($"Exporting with: {filetype}");
+      
       string dir = Directory.GetCurrentDirectory();
       string tempDirectory = $"{dir}/export.tmp/{DateTime.Now:yyyMMddHHmmsss}/";
       FileInfo file = new(tempDirectory);
@@ -119,7 +122,6 @@ namespace ParkAir___Assignment.Menus.ExportHandlers
       string timestamp = $"{DateTime.Now:yyyMMddHHmmsss}";
       foreach (KeyValuePair<string, List<SysMessage>> sortedItem in sortedDictionary)
       {
-        Console.WriteLine($"Exporting For: {sortedItem.Key}");
         FileInfo tempfile = new($"{tempDirectory}{sortedItem.Key}_{timestamp}.{filetype.ToLower()}");
         StreamWriter writer = tempfile.AppendText();
         switch (filetype)
@@ -145,7 +147,7 @@ namespace ParkAir___Assignment.Menus.ExportHandlers
       string moveDirectoryPath = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}/parkair_exports/";
       FileInfo moveDirectory = new(moveDirectoryPath);
       moveDirectory.Directory.Create();
-      Console.WriteLine($"Moving to: {moveDirectoryPath}export_{timestamp}.zip");
+      Console.WriteLine($"Saving to: {moveDirectoryPath}export_{timestamp}.zip");
       ZipFile.CreateFromDirectory(tempDirectory, $"{moveDirectoryPath}export_{timestamp}.zip", CompressionLevel.Fastest, false);
 
       DirectoryInfo d = new DirectoryInfo(tempDirectory);
@@ -156,6 +158,7 @@ namespace ParkAir___Assignment.Menus.ExportHandlers
       }
       Directory.Delete(tempDirectory);
       Directory.Delete($"{dir}/export.tmp/");
+      Process.Start("explorer.exe", @$"{moveDirectoryPath}{Path.DirectorySeparatorChar}{moveDirectoryPath}export_{timestamp}.zip");
       
     }
   }

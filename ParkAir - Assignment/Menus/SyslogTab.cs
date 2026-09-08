@@ -47,16 +47,17 @@ public class SyslogTab : ITab
     t_backgroundListenerThread.Start();
   }
 
-  private static int Mod(int k, int n)
-  {
-    return (k %= n) < 0 ? k + n : k;
-  }
 
   public string TabName { get; set; } = "Syslog";
   public string ScreenString { get; private set; } = "";
   public bool Tabber { get; private set; } = true;
   public Gui? _gui { get; private set; }
   public bool Restart { get; } = true;
+ 
+  private static int Mod(int k, int n)
+  {
+    return (k %= n) < 0 ? k + n : k;
+  }
 
   public void RestartTab()
   {

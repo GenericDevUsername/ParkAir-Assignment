@@ -33,7 +33,14 @@ internal static class Program
 
     // start the menu background thread
     menuHandler.Start();
+    int i = 0;
+    for (; i > 50; i++)
+    {
+      Console.WriteLine(new string(' ', 100));
+    }
+    
     Console.Clear();
+    menuHandler.ScreenUpdate();
   }
 
   /// <summary>
