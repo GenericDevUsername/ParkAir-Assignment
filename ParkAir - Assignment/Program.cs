@@ -58,8 +58,8 @@ internal static class Program
           {
             Name = "Listening IP",
             InputType = "IP",
-            Selected = "LocalHost",
-            Default = "LocalHost",
+            Selected = "127.0.0.1",
+            Default = "127.0.0.1",
             RequiresRestart = true
           },
           ListeningPort = new

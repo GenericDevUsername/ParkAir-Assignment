@@ -2,7 +2,7 @@
 
 namespace ParkAir___Assignment.Syslog
 {
-  internal class SyslogServer
+  public class SyslogServer
   {
     internal IPAddress _listeningIP;
     internal readonly int _listeningPort;
@@ -54,7 +54,7 @@ namespace ParkAir___Assignment.Syslog
     }
     private void RunUdp()
     {
-
+      UdpListener udpServerListener = new UdpListener(this);
     }
 
 

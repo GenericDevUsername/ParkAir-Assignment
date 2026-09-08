@@ -21,7 +21,7 @@ namespace ParkAir___Assignment.Syslog
         string returnData = Encoding.ASCII.GetString(receiveBytes);
 
 
-        server._log.Add(new());
+        server._log.Add(new(returnData));
         Thread.Sleep(1);
       }
     }
