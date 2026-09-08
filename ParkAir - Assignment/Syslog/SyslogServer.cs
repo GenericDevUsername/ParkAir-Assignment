@@ -9,8 +9,8 @@ public class SyslogServer
   internal IPAddress _listeningIP;
   internal int _listeningPort;
   internal List<SysMessage> _log = new();
-  private TcpListener? _tcpServerListener;
-  private UdpListener? _udpServerListener;
+  private SysTcpListener? _tcpServerListener;
+  private SysUdpListener? _udpServerListener;
 
   private readonly Thread t_TcpListenerThread;
 
@@ -26,13 +26,13 @@ public class SyslogServer
 
     ip ??= IPAddress.Parse("127.0.0.1");
 
-    _listeningIP = ip;
-    _listeningPort = port;
-    _listeningType = type;
+    this._listeningIP = ip;
+    this._listeningPort = port;
+    this._listeningType = type;
 
-    t_TcpListenerThread = new Thread(RunTcp);
+    this.t_TcpListenerThread = new Thread(RunTcp);
 
-    t_UdpListenerThread = new Thread(RunUdp);
+    this.t_UdpListenerThread = new Thread(RunUdp);
 
   }
 
@@ -45,36 +45,36 @@ public class SyslogServer
 
   public void Start()
   {
-    switch (_listeningType)
+    switch (this._listeningType)
     {
       case "UDP":
-        t_UdpListenerThread.Start();
+        this.t_UdpListenerThread.Start();
         break;
 
       case "TCP":
-        t_TcpListenerThread.Start();
+        this.t_TcpListenerThread.Start();
         break;
 
       case "BOTH":
-        t_UdpListenerThread.Start();
-        t_TcpListenerThread.Start();
+        this.t_UdpListenerThread.Start();
+        this.t_TcpListenerThread.Start();
         break;
     }
   }
 
   public void Restart()
   {
-    _udpServerListener?.Restart();
-    _tcpServerListener?.Stop();
+    this._udpServerListener?.Restart();
+    this._tcpServerListener?.Restart();
   }
 
   private void RunTcp()
   {
-
+    this._tcpServerListener = new SysTcpListener(this);
   }
 
   private void RunUdp()
   {
-    _udpServerListener = new UdpListener(this);
+    this._udpServerListener = new SysUdpListener(this);
   }
 }

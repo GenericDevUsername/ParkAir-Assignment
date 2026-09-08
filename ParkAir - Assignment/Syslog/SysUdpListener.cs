@@ -4,13 +4,13 @@ using System.Text;
 
 namespace ParkAir___Assignment.Syslog;
 
-internal class UdpListener
+internal class SysUdpListener
 {
   private IPEndPoint _remoteIpEndpoint;
   private readonly SyslogServer _server;
   private UdpClient _udpClientListener;
 
-  public UdpListener(SyslogServer server)
+  public SysUdpListener(SyslogServer server)
   {
     _server = server;
     _udpClientListener = new UdpClient(server._listeningPort);

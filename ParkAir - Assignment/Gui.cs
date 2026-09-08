@@ -6,7 +6,7 @@ namespace ParkAir___Assignment;
 public class Gui
 {
   private const bool CURSOR = false;
-  private readonly List<string> _debug = new() { "", "" };
+  private readonly List<string> _debug = new() { "", "", "" };
   private Task? _inputTaskHandler;
   private int _lines;
   internal int _tabIndex;
