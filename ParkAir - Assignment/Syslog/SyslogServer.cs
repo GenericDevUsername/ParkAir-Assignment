@@ -36,7 +36,13 @@ namespace ParkAir___Assignment.Syslog
         if (this._clearLogs)
           try
           {
-            File.Delete(filePath);
+            DirectoryInfo d = new($"{dir}/local.store/");
+
+            FileInfo[] files = d.GetFiles("logs-??.??.*.csv");
+            foreach (FileInfo file in files)
+            {
+              file.Delete();
+            }
             this._clearLogs = false;
           }
           catch
