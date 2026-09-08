@@ -91,7 +91,7 @@ namespace ParkAir___Assignment.Menus
           break;
 
         case "IP":
-          string newIp = this._gui.Input(top: setting.Line, left: 64, prefill: (string)setting.Value["Selected"], spaceholder: '_', max: 26, length: 26, customError: "Not a valid IP!", regexCheck: new Regex(@"((((localhost)|(([2]([0-4][0-9]|[5][0-5])|[0-1]?[0-9]?[0-9])[.]){3}(([2]([0-4][0-9]|[5][0-5])|[0-1]?[0-9]?[0-9]))))+)"));
+          string newIp = this._gui.Input(top: setting.Line, left: 64, prefill: (string)setting.Value["Selected"], spaceholder: '_', max: 26, length: 26, customError: "Not a valid IP!", regexCheck: new Regex(@"^((((localhost)|(([2]([0-4][0-9]|[5][0-5])|[0-1]?[0-9]?[0-9])[.]){3}(([2]([0-4][0-9]|[5][0-5])|[0-1]?[0-9]?[0-9]))))+)$"));
           setting.Set(newIp);
           break;
 
