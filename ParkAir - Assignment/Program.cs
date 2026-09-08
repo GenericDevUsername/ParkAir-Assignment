@@ -20,6 +20,8 @@ namespace ParkAir___Assignment
       menuHandler.AddTab(InitSettings($"{dir}/settings.json"));
       menuHandler.AddTab(InitSettings($"{dir}/settings.json"));
 
+      Console.
+
 
       menuHandler.Start();
       while (true)
