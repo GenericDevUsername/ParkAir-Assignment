@@ -21,7 +21,7 @@ namespace ParkAir___Assignment
       External.AnsiConsole.Initialize();
 
       // get current working directory
-      var dir = Directory.GetCurrentDirectory();
+      string dir = Directory.GetCurrentDirectory();
 
       ///// SETUP UI CLASS /////
       Gui menuHandler = new("Park Air Syslog");
@@ -33,7 +33,7 @@ namespace ParkAir___Assignment
 
       // start the menu background thread
       menuHandler.Start();
-      var i = 0;
+      int i = 0;
       for (; i > 50; i++) Console.WriteLine(new string(' ', 100));
 
       Console.Clear();
@@ -199,7 +199,7 @@ namespace ParkAir___Assignment
         using (FileStream fs = File.Create(fp))
         {
           // Convert the file to byes and save to the settings file
-          var info = new UTF8Encoding(true).GetBytes(settingsTemplate.ToString());
+          byte[] info = new UTF8Encoding(true).GetBytes(settingsTemplate.ToString());
           fs.Write(info, 0, info.Length);
         }
 

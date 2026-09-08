@@ -34,8 +34,8 @@ namespace ParkAir___Assignment.Syslog
     {
       try
       {
-        var received = this._udpClientListener.EndReceive(res, ref this._remoteIpEndpoint);
-        var returnData = Encoding.ASCII.GetString(received);
+        byte[] received = this._udpClientListener.EndReceive(res, ref this._remoteIpEndpoint);
+        string returnData = Encoding.ASCII.GetString(received);
 
 
         this._server.LogAppend(new(returnData));

@@ -87,15 +87,15 @@ namespace ParkAir___Assignment
       List<string>? autocomplete = null)
     {
       // Assign dynamic location defaults based on current cursor position
-      var currentCursorVisibility = Console.CursorVisible;
+      bool currentCursorVisibility = Console.CursorVisible;
       if (top == -1 || left == -1) (left, top) = Console.GetCursorPosition();
       if (length == -1) length = Console.WindowWidth - (left >= 0 ? left : 0);
 
 
       // Pre define variables based on above information
       // (if a prefill is provided we must start the function at a point where it appears this input has already been typed in)
-      var inputOutput = prefill == "" ? "" : prefill;
-      var currentIndex = prefill == "" ? -1 : prefill.Length - 1;
+      string inputOutput = prefill == "" ? "" : prefill;
+      int currentIndex = prefill == "" ? -1 : prefill.Length - 1;
 
       // Check if the prefill already surpasses the provided max char count, If it does throw an error
       if (max is not null && max < prefill.Length)
@@ -105,9 +105,9 @@ namespace ParkAir___Assignment
       }
 
 
-      var intercept = true;
-      var cancel = false;
-      var errorMsg = "";
+      bool intercept = true;
+      bool cancel = false;
+      string errorMsg = "";
       while (intercept)
       {
         // refresh screen
@@ -124,7 +124,7 @@ namespace ParkAir___Assignment
             Console.WriteLine("\u001b[100;97mNo Recommendations Found\u001b[0m");
           }
 
-          for (var i = 0; i < resultsList.Count && i < 11; i++)
+          for (int i = 0; i < resultsList.Count && i < 11; i++)
           {
             Console.SetCursorPosition(left, top + 2 + i);
             switch (i)
@@ -140,7 +140,7 @@ namespace ParkAir___Assignment
         }
 
         // update indexes
-        var maxIndex = inputOutput.Length;
+        int maxIndex = inputOutput.Length;
 
         Console.CursorVisible = false;
         Console.SetCursorPosition(left, top); // Position cursor at provided location
@@ -257,11 +257,11 @@ namespace ParkAir___Assignment
           if (tab == Tabs[Tabs.Count - 1 < 0 ? 0 : Tabs.Count - 1] &&
               tabBottom.Length - (Tabs[this._tabIndex].Tabber ? 0 : 9) < 92)
           {
-            var lineCount = 92 - tabBottom.Length < 0 ? 0 : 92 - tabBottom.Length;
-            var bottomString = tabBottom.ToString();
+            int lineCount = 92 - tabBottom.Length < 0 ? 0 : 92 - tabBottom.Length;
+            string bottomString = tabBottom.ToString();
             tabBottom.Clear();
             tabBottom.Append($"{bottomString.Remove(bottomString.Length - 1, 1)}{new('─', lineCount)}┐");
-            var lineThreeArray = tabBottom.ToString().ToCharArray();
+            char[] lineThreeArray = tabBottom.ToString().ToCharArray();
             lineThreeArray[tabMiddle.Length - (Tabs[this._tabIndex].Tabber ? 0 : 18) - 1] = '┴';
             tabBottom.Clear();
             tabBottom.Append(string.Join("", lineThreeArray));
@@ -283,8 +283,8 @@ namespace ParkAir___Assignment
 
             tabBottom.Clear();
             tabBottom.Append($"{tempBuilder.Remove(tempBuilder.Length - 1, 1)}┘");
-            var lineThreeArray = tabBottom.ToString().ToCharArray();
-            var lineTwoArray = tabMiddle.ToString().ToCharArray();
+            char[] lineThreeArray = tabBottom.ToString().ToCharArray();
+            char[] lineTwoArray = tabMiddle.ToString().ToCharArray();
             lineThreeArray[91] = lineTwoArray[Tabs[this._tabIndex].Tabber ? 91 : 96] == '│' ? '┼' : '┬';
 
             tabBottom.Clear();
@@ -317,17 +317,17 @@ namespace ParkAir___Assignment
         return;
       }
 
-      var tabs = GenerateTabs(this);
-      var screen = $"{tabs}\n{Tabs[this._tabIndex].Screen()}";
+      string tabs = GenerateTabs(this);
+      string screen = $"{tabs}\n{Tabs[this._tabIndex].Screen()}";
       List<string> screenLines = screen.Split("\n").ToList();
       screenLines.AddRange(this._debug);
-      var newLines = screenLines.Count;
+      int newLines = screenLines.Count;
 
-      for (var i = 0; i < screenLines.Count; i++)
+      for (int i = 0; i < screenLines.Count; i++)
         screenLines[i] =
           $"{screenLines[i]}{new string(' ', Console.BufferWidth - screenLines[i].Length < 0 ? 0 : Console.BufferWidth - screenLines[i].Length)}";
 
-      for (var i = 0; i < this._debug.Count + this._lines - newLines; i++)
+      for (int i = 0; i < this._debug.Count + this._lines - newLines; i++)
         screenLines.Add($"{new string(' ', Console.BufferWidth)}");
 
       this._lines = newLines;
@@ -394,7 +394,7 @@ namespace ParkAir___Assignment
       // (Keeping this in my assignment so you can see the keys being handled)
       if (this._debug[0] == $"{key.Key.ToString()}          ")
       {
-        var temp = Convert.ToInt32(this._debug[1].Replace(" ", "").Remove(0, 1));
+        int temp = Convert.ToInt32(this._debug[1].Replace(" ", "").Remove(0, 1));
         temp++;
         this._debug[1] = $"x{temp}          ";
       }

@@ -9,7 +9,7 @@ namespace ParkAir___Assignment.Menus.ExportHandlers
   {
     private static IEnumerable<SysMessage> LoadLogs()
     {
-      var dir = Directory.GetCurrentDirectory();
+      string dir = Directory.GetCurrentDirectory();
       DirectoryInfo d = new($"{dir}/local.store/");
 
       FileInfo[] files = d.GetFiles("logs-??.??.*.csv");
@@ -20,7 +20,7 @@ namespace ParkAir___Assignment.Menus.ExportHandlers
         preLoad.TextFieldType = FieldType.Delimited;
         preLoad.SetDelimiters(",");
 
-        var i = 0;
+        int i = 0;
         List<string> logs = new();
         while (!preLoad.EndOfData)
         {
@@ -37,7 +37,7 @@ namespace ParkAir___Assignment.Menus.ExportHandlers
         }
 
         preLoad.Close();
-        foreach (var log in logs) yield return new(log);
+        foreach (string log in logs) yield return new(log);
       }
     }
 
@@ -46,10 +46,10 @@ namespace ParkAir___Assignment.Menus.ExportHandlers
     {
       Console.WriteLine($"Exporting with: {filetype}");
 
-      var dir = Directory.GetCurrentDirectory();
-      var filename = $"export_{DateTime.Now:yyyMMddHHmmsss}";
-      var tempDirectory = $"{dir}/export.tmp/{DateTime.Now:yyyMMddHHmmsss}";
-      var tempFile = $"{tempDirectory}/{filename}.{filetype.ToLower()}";
+      string dir = Directory.GetCurrentDirectory();
+      string filename = $"export_{DateTime.Now:yyyMMddHHmmsss}";
+      string tempDirectory = $"{dir}/export.tmp/{DateTime.Now:yyyMMddHHmmsss}";
+      string tempFile = $"{tempDirectory}/{filename}.{filetype.ToLower()}";
       FileInfo file = new(tempFile);
       file.Directory.Create();
 
@@ -72,12 +72,12 @@ namespace ParkAir___Assignment.Menus.ExportHandlers
       writer.Close();
 
 
-      var moveDirectoryPath = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}/parkair_exports/";
+      string moveDirectoryPath = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}/parkair_exports/";
       FileInfo moveDirectory = new(moveDirectoryPath);
       moveDirectory.Directory.Create();
       Console.WriteLine($"Saving to: {$"{moveDirectoryPath}{filename}.{filetype.ToLower()}"}");
 
-      var i = 0;
+      int i = 0;
       while (true)
       {
         try
@@ -103,20 +103,20 @@ namespace ParkAir___Assignment.Menus.ExportHandlers
     {
       Console.WriteLine($"Exporting with: {filetype}");
 
-      var dir = Directory.GetCurrentDirectory();
-      var tempDirectory = $"{dir}/export.tmp/{DateTime.Now:yyyMMddHHmmsss}/";
+      string dir = Directory.GetCurrentDirectory();
+      string tempDirectory = $"{dir}/export.tmp/{DateTime.Now:yyyMMddHHmmsss}/";
       FileInfo file = new(tempDirectory);
       file.Directory.Create();
 
       Dictionary<string, List<SysMessage>> sortedDictionary = new();
       foreach (SysMessage logMessage in LoadLogs().OrderBy(s => s.timestamp))
       {
-        var dictionaryKey = logMessage.hostname.ToLower().Replace(" ", "_");
+        string dictionaryKey = logMessage.hostname.ToLower().Replace(" ", "_");
         if (!sortedDictionary.ContainsKey(dictionaryKey)) sortedDictionary.Add(dictionaryKey, new());
         sortedDictionary[dictionaryKey].Add(logMessage);
       }
 
-      var timestamp = $"{DateTime.Now:yyyMMddHHmmsss}";
+      string timestamp = $"{DateTime.Now:yyyMMddHHmmsss}";
       foreach (KeyValuePair<string, List<SysMessage>> sortedItem in sortedDictionary)
       {
         FileInfo tempfile = new($"{tempDirectory}{sortedItem.Key}_{timestamp}.{filetype.ToLower()}");
@@ -139,7 +139,7 @@ namespace ParkAir___Assignment.Menus.ExportHandlers
         writer.Close();
       }
 
-      var moveDirectoryPath = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}/parkair_exports/";
+      string moveDirectoryPath = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}/parkair_exports/";
       FileInfo moveDirectory = new(moveDirectoryPath);
       moveDirectory.Directory.Create();
       Console.WriteLine($"Saving to: {moveDirectoryPath}export_{timestamp}.zip");

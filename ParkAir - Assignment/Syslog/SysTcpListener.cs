@@ -56,9 +56,9 @@ namespace ParkAir___Assignment.Syslog
         try
         {
           //("Reading data...");
-          var data = new byte[200];
-          var size = client.Receive(data);
-          var returnData = Encoding.ASCII.GetString(data);
+          byte[] data = new byte[200];
+          int size = client.Receive(data);
+          string returnData = Encoding.ASCII.GetString(data);
           this._server.LogAppend(new(returnData.Replace("\n", "")));
         }
         catch (Exception e)

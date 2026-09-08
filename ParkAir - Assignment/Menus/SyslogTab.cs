@@ -158,17 +158,17 @@ namespace ParkAir___Assignment.Menus
 
 
       List<SysMessage> lastAmount = logs.Skip(Math.Max(0, logs.Count - 15)).ToList();
-      var screenReturn = "";
+      string screenReturn = "";
 
-      var ipFilterString = $"{this._ipfilter}{new string('_', 26 - this._ipfilter.Length)}";
+      string ipFilterString = $"{this._ipfilter}{new string('_', 26 - this._ipfilter.Length)}";
       screenReturn +=
         $"│[{(this._selectint == 0 ? ">" : " ")}] Filter IP{new(' ', 85 - 9 - ipFilterString.Length)}{ipFilterString} │\n";
 
 
-      var sevcolor =
+      string sevcolor =
         $"{(this._severityFilter >= 0 ? new Color().FromSetting((string)this._settings.Settings.SelectToken($"Colors.{this._color[this._severityFilter]}.Selected")) : "")}";
-      var offset = this._severityFilter >= 0 ? sevcolor.Length + 4 : 0;
-      var sevFilterString =
+      int offset = this._severityFilter >= 0 ? sevcolor.Length + 4 : 0;
+      string sevFilterString =
         $"{(this._severityFilter >= 0 ? $"{sevcolor}{this._color[this._severityFilter]}\x1b[0m" : "UNSET")}";
       screenReturn +=
         $"│[{(this._selectint == 1 ? ">" : " ")}] Filter Type{new(' ', 83 - 11 - sevFilterString.Length + offset)}[{sevFilterString}] │\n";
@@ -177,10 +177,10 @@ namespace ParkAir___Assignment.Menus
         $"│[{(this._selectint == 3 - 1 ? ">" : " ")}] Delete Local Store {(this._selectint == 3 - 1 ? this._resetter > 0 ? $"\x1b[31m(Press Enter {3 - this._resetter} More Time(s) to Confirm)\x1b[0m" : "(Press Enter)" : " ")}{new(' ', 85 - 19 - (this._selectint == 3 - 1 ? this._resetter > 0 ? 38 : 12 : 0))}│\n";
       screenReturn += $"├──────────┬─────────────────┬{new string('─', 61)}┤\n";
 
-      var i = 0;
+      int i = 0;
       foreach (SysMessage log in lastAmount)
       {
-        var color = new Color().FromSetting(
+        string? color = new Color().FromSetting(
           (string)this._settings.Settings.SelectToken($"Colors.{this._color[log.severity]}.Selected"));
         screenReturn +=
           $"│ {log.timestamp.ToLongTimeString()} │{color} {$"[{this._color[log.severity].ToUpper()}]",-15}\x1b[0m │ {log.sysString}\x1b[0m\n";

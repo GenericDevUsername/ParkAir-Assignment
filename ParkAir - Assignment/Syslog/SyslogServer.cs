@@ -31,8 +31,8 @@ namespace ParkAir___Assignment.Syslog
     {
       while (true)
       {
-        var dir = Directory.GetCurrentDirectory();
-        var filePath = $"{dir}/local.store/logs-{DateTime.Now:M.d.yyyy}.csv";
+        string dir = Directory.GetCurrentDirectory();
+        string filePath = $"{dir}/local.store/logs-{DateTime.Now:M.d.yyyy}.csv";
         if (this._clearLogs)
           try
           {
@@ -79,8 +79,8 @@ namespace ParkAir___Assignment.Syslog
 
     public SyslogServer(IPAddress? ip = null, int port = 514, string type = "BOTH")
     {
-      var dir = Directory.GetCurrentDirectory();
-      var filePath = $"{dir}/local.store/logs-{DateTime.Now:M.d.yyyy}.csv";
+      string dir = Directory.GetCurrentDirectory();
+      string filePath = $"{dir}/local.store/logs-{DateTime.Now:M.d.yyyy}.csv";
 
       if (File.Exists(filePath))
       {
@@ -88,7 +88,7 @@ namespace ParkAir___Assignment.Syslog
         preLoad.TextFieldType = FieldType.Delimited;
         preLoad.SetDelimiters(",");
 
-        var i = 0;
+        int i = 0;
         while (!preLoad.EndOfData)
         {
           //Processing row

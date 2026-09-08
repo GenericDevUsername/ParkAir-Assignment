@@ -95,7 +95,7 @@ namespace ParkAir___Assignment.Menus
     public string Screen()
     {
       List<string> screenLines = new();
-      var line = _gui is { Tabs.Count: > 1 } ? 3 : 1;
+      int line = _gui is { Tabs.Count: > 1 } ? 3 : 1;
       foreach (SettingsCategory category in this._settings)
       {
         screenLines.Add($"│{category.Name}:{new(' ', 89 - category.Name.Length)}│");
@@ -124,7 +124,7 @@ namespace ParkAir___Assignment.Menus
 
     private void BuildSettings()
     {
-      foreach (var category in Settings)
+      foreach (KeyValuePair<string, JToken?> category in Settings)
       {
         if (category.Value is null) continue;
         if (category.Key == "FirstLaunch" || category.Value.Type != JTokenType.Object) continue;
@@ -135,7 +135,7 @@ namespace ParkAir___Assignment.Menus
     private void BuildCategory(string name, JToken settings)
     {
       SettingsCategory builtCategory = new(name, this);
-      foreach (var setting in settings.Value<JObject>()!)
+      foreach (KeyValuePair<string, JToken?> setting in settings.Value<JObject>()!)
       {
         Setting settingClass = new(builtCategory, setting, this._selectionIndex.Count);
         builtCategory.Settings.Add(settingClass);
@@ -158,9 +158,9 @@ namespace ParkAir___Assignment.Menus
           break;
 
         case "SingleSelect":
-          var response = (string)setting.Value["Selected"];
+          string response = (string)setting.Value["Selected"];
           List<string> indexArray = setting.Value.SelectToken("Options").ToObject<string[]>().ToList();
-          var currentIndex = indexArray.IndexOf(response);
+          int currentIndex = indexArray.IndexOf(response);
           // Get The Next Value
           if ((ctx.Key == ConsoleKey.Enter || ctx.Key == ConsoleKey.RightArrow) && currentIndex > -1)
             setting.Set(indexArray[Mod(currentIndex + 1, indexArray.Count)]);
@@ -178,7 +178,7 @@ namespace ParkAir___Assignment.Menus
 
           List<string> autocompleteList = localIPs.Select(ip => ip.ToString()).ToList();
 
-          var newIp = _gui.Input(top: setting.Line, left: 64, prefill: (string)setting.Value["Selected"],
+          string newIp = _gui.Input(top: setting.Line, left: 64, prefill: (string)setting.Value["Selected"],
             spaceholder: '_', max: 26, length: 26, customError: "Not a valid IP!", autocomplete: autocompleteList,
             regexCheck: new(
               @"^((((([lL]ocal[hH]ost)|(([2]([0-4][0-9]|[5][0-5])|[0-1]?[0-9]?[0-9])[.]){3}(([2]([0-4][0-9]|[5][0-5])|[0-1]?[0-9]?[0-9]))))+))|((([0-9a-fA-F]{0,4})\:){2,7})([0-9a-fA-F]{0,4})$"));
@@ -186,7 +186,7 @@ namespace ParkAir___Assignment.Menus
           break;
 
         case "Port":
-          var newPort = _gui.Input(top: setting.Line, left: 64, prefill: (string)setting.Value["Selected"],
+          string newPort = _gui.Input(top: setting.Line, left: 64, prefill: (string)setting.Value["Selected"],
             spaceholder: '_', max: 5, length: 26, customError: "Use valid port (0 - 65535)!",
             regexCheck: new(
               @"^([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$"));
@@ -205,9 +205,9 @@ namespace ParkAir___Assignment.Menus
 
     private string SettingString(Setting setting)
     {
-      var valueDisplay = "";
-      var offset = 0;
-      var settingType = (string)setting.Value["InputType"];
+      string valueDisplay = "";
+      int offset = 0;
+      string settingType = (string)setting.Value["InputType"];
       switch (settingType)
       {
         case "SingleSelect":

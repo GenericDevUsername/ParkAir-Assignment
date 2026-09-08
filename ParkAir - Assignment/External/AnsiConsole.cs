@@ -26,7 +26,7 @@ namespace ParkAir___Assignment.External
       IntPtr handle = GetStdHandle(STD_OUTPUT_HANDLE);
       if (handle == IntPtr.Zero) throw new("Cannot get standard output handle");
 
-      if (!GetConsoleMode(handle, out var mode)) throw new("Cannot get console mode");
+      if (!GetConsoleMode(handle, out uint mode)) throw new("Cannot get console mode");
 
       mode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
       if (!SetConsoleMode(handle, mode)) throw new("Cannot set console mode");
