@@ -38,16 +38,16 @@
     public string Next(string current)
     {
       string response = "Default";
-      int currentIndex = _order.IndexOf(current);
-      if (currentIndex > -1) response = _order[Mod(currentIndex + 1, _order.Count)];
+      int currentIndex = this._order.IndexOf(current);
+      if (currentIndex > -1) response = this._order[Mod(currentIndex + 1, this._order.Count)];
       return response;
     }
 
     public string Previous(string current)
     {
       string response = "Default";
-      int currentIndex = _order.IndexOf(current);
-      if (currentIndex > -1) response = _order[Mod(currentIndex - 1, _order.Count)];
+      int currentIndex = this._order.IndexOf(current);
+      if (currentIndex > -1) response = this._order[Mod(currentIndex - 1, this._order.Count)];
       return response;
     }
 
