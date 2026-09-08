@@ -1,17 +1,18 @@
-﻿namespace ParkAir___Assignment.Menus.SettingsHandlers;
-
-public class SettingsCategory
+﻿namespace ParkAir___Assignment.Menus.SettingsHandlers
 {
-  public readonly string FilePath;
-  public readonly string Name;
-  public readonly List<Setting> Settings = new();
-
-  public SettingsCategory(string name, SettingsTab tab)
+  public class SettingsCategory
   {
-    Tab = tab;
-    FilePath = tab.SettingsFile;
-    Name = name;
-  }
+    public readonly string FilePath;
+    public readonly string Name;
+    public readonly List<Setting> Settings = new();
 
-  internal SettingsTab Tab { get; }
+    public SettingsCategory(string name, SettingsTab tab)
+    {
+      Tab = tab;
+      this.FilePath = tab.SettingsFile;
+      this.Name = name;
+    }
+
+    internal SettingsTab Tab { get; }
+  }
 }

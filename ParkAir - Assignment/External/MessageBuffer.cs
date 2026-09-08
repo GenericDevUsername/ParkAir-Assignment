@@ -15,20 +15,19 @@ namespace ParkAir___Assignment.Syslog
 
     public SlidingBuffer(int maxCount)
     {
-      _maxCount = maxCount;
-      _queue = new Queue<T>(maxCount);
+      this._maxCount = maxCount;
+      this._queue = new(maxCount);
     }
 
     public void Add(T item)
     {
-      if (_queue.Count == _maxCount)
-        _queue.Dequeue();
-      _queue.Enqueue(item);
+      if (this._queue.Count == this._maxCount) this._queue.Dequeue();
+      this._queue.Enqueue(item);
     }
 
     public IEnumerator<T> GetEnumerator()
     {
-      return _queue.GetEnumerator();
+      return this._queue.GetEnumerator();
     }
 
     IEnumerator IEnumerable.GetEnumerator()

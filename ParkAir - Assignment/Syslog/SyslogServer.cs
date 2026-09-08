@@ -23,7 +23,7 @@ namespace ParkAir___Assignment.Syslog
 
     public void LogAppend(SysMessage message)
     {
-      _queue.Enqueue(message);
+      this._queue.Enqueue(message);
       this._log.Add(message);
     }
 
@@ -31,10 +31,9 @@ namespace ParkAir___Assignment.Syslog
     {
       while (true)
       {
-        string dir = Directory.GetCurrentDirectory();
-        string filePath = $"{dir}/local.store/logs-{DateTime.Now:M.d.yyyy}.csv";
+        var dir = Directory.GetCurrentDirectory();
+        var filePath = $"{dir}/local.store/logs-{DateTime.Now:M.d.yyyy}.csv";
         if (this._clearLogs)
-        {
           try
           {
             File.Delete(filePath);
@@ -44,8 +43,7 @@ namespace ParkAir___Assignment.Syslog
           {
             // ignore
           }
-        }
-        
+
         if (!File.Exists(filePath))
         {
           // if the settings file doesn't exist create it with default values
@@ -55,7 +53,7 @@ namespace ParkAir___Assignment.Syslog
           file.Directory.Create(); // If the directory already exists, this method does nothing.
           File.WriteAllText(file.FullName, values);
         }
-          
+
         StreamWriter writer = File.AppendText(filePath);
         try
         {
@@ -66,30 +64,32 @@ namespace ParkAir___Assignment.Syslog
             continue;
           }
 
-          writer.WriteLine($"{logMessage.priority},{logMessage.version},{logMessage.timestamp.ToUniversalTime().ToString("u").Replace(" ", "T")},\"{logMessage.hostname}\",{logMessage.application},{logMessage.processId},{logMessage.messageId},{logMessage.structuredData},{logMessage.message},{logMessage.severity},\"{logMessage.sysString}\"");
+          writer.WriteLine(
+            $"{logMessage.priority},{logMessage.version},{logMessage.timestamp.ToUniversalTime().ToString("u").Replace(" ", "T")},\"{logMessage.hostname}\",{logMessage.application},{logMessage.processId},{logMessage.messageId},{logMessage.structuredData},{logMessage.message},{logMessage.severity},\"{logMessage.sysString}\"");
 
         }
         catch (InvalidOperationException)
         {
           Thread.Sleep((int)1E3);
         }
+
         writer.Close();
       }
     }
 
     public SyslogServer(IPAddress? ip = null, int port = 514, string type = "BOTH")
     {
-      string dir = Directory.GetCurrentDirectory();
-      string filePath = $"{dir}/local.store/logs-{DateTime.Now:M.d.yyyy}.csv";
+      var dir = Directory.GetCurrentDirectory();
+      var filePath = $"{dir}/local.store/logs-{DateTime.Now:M.d.yyyy}.csv";
 
       if (File.Exists(filePath))
       {
-        TextFieldParser preLoad = new TextFieldParser(filePath);
+        TextFieldParser preLoad = new(filePath);
         preLoad.TextFieldType = FieldType.Delimited;
         preLoad.SetDelimiters(",");
 
-        int i = 0;
-        while (!preLoad.EndOfData) 
+        var i = 0;
+        while (!preLoad.EndOfData)
         {
           //Processing row
           string[] fields = preLoad.ReadFields();
@@ -98,16 +98,18 @@ namespace ParkAir___Assignment.Syslog
             i++;
             continue;
           }
+
           this._log.Add(new(fields.Last()));
           i++;
         }
+
         preLoad.Close();
       }
 
-      
-      this.t_fileLogger = new Thread(FileLogger);
+
+      this.t_fileLogger = new(FileLogger);
       this.t_fileLogger.Start();
-      
+
       if (type != "UDP" && type != "TCP" && type != "BOTH")
       {
         Exception error = new("Type must be UDP, TCP or BOTH");
@@ -120,9 +122,9 @@ namespace ParkAir___Assignment.Syslog
       this._listeningPort = port;
       this._listeningType = type;
 
-      this.t_TcpListenerThread = new Thread(RunTcp);
+      this.t_TcpListenerThread = new(RunTcp);
 
-      this.t_UdpListenerThread = new Thread(RunUdp);
+      this.t_UdpListenerThread = new(RunUdp);
 
     }
 
@@ -130,7 +132,7 @@ namespace ParkAir___Assignment.Syslog
 
     public List<SysMessage> GetLogs()
     {
-      return new List<SysMessage>(this._log);
+      return new(this._log);
     }
 
     public void Start()
@@ -160,12 +162,12 @@ namespace ParkAir___Assignment.Syslog
 
     private void RunTcp()
     {
-      this._tcpServerListener = new SysTcpListener(this);
+      this._tcpServerListener = new(this);
     }
 
     private void RunUdp()
     {
-      this._udpServerListener = new SysUdpListener(this);
+      this._udpServerListener = new(this);
     }
   }
 }

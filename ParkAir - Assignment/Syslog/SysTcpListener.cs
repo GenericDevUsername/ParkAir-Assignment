@@ -14,23 +14,23 @@ namespace ParkAir___Assignment.Syslog
     public SysTcpListener(SyslogServer server)
     {
       this._server = server;
-      
+
       string message;
       Socket client;
       string returnData;
-      
-      this._listener = new TcpListener(IPAddress.Any, this._server._listeningPort);
+
+      this._listener = new(IPAddress.Any, this._server._listeningPort);
       this._listener.Start();
-      
+
       HandleListener(this._listener);
     }
-    
+
     public void Restart()
     {
       this._listener.Stop();
       this._exit = true;
 
-      this._listener = new TcpListener(IPAddress.Any, this._server._listeningPort);
+      this._listener = new(IPAddress.Any, this._server._listeningPort);
       this._listener.Start();
 
       this._exit = false;
@@ -46,20 +46,20 @@ namespace ParkAir___Assignment.Syslog
         ThreadPool.QueueUserWorkItem(ThreadProc, client);
       }
     }
-    
+
     private void ThreadProc(object obj)
     {
-      var client = (Socket)obj;
-      
+      Socket? client = (Socket)obj;
+
       while (true)
       {
         try
         {
           //("Reading data...");
-          byte[] data = new byte[200];
-          int size = client.Receive(data);
-          string returnData = Encoding.ASCII.GetString(data);
-          this._server.LogAppend(new SysMessage(returnData.Replace("\n", "")));
+          var data = new byte[200];
+          var size = client.Receive(data);
+          var returnData = Encoding.ASCII.GetString(data);
+          this._server.LogAppend(new(returnData.Replace("\n", "")));
         }
         catch (Exception e)
         {
