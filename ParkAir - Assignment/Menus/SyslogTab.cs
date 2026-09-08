@@ -7,6 +7,11 @@ public class SyslogTab : ITab
     public bool Tabber => true;
     public Gui? _gui { get; private set; }
 
+    public SyslogTab(SettingsTab settings)
+    {
+        
+    }
+
     public void HandleKeypress(ConsoleKeyInfo key)
     {
     }

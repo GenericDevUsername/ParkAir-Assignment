@@ -15,8 +15,9 @@ internal static class Program
         var dir = Directory.GetCurrentDirectory();
 
         Gui menuHandler = new();
-        menuHandler.AddTab(InitSettings($"{dir}/settings.json"));
-        menuHandler.AddTab(new SyslogTab());
+        SettingsTab settingsConfig = InitSettings($"{dir}/settings.json");
+        menuHandler.AddTab(settingsConfig);
+        menuHandler.AddTab(new SyslogTab(settingsConfig));
 
         menuHandler.Start();
     }
