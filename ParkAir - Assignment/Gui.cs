@@ -25,18 +25,8 @@ namespace ParkAir___Assignment
     {
       this._inputTaskHandler = new(InputHandler);
       this._inputTaskHandler.Start();
+    }
 
-      RunInBackground(TimeSpan.FromMilliseconds(33), ScreenUpdate);
-    }
-    
-    private static async Task RunInBackground(TimeSpan timeSpan, Action action)
-    {
-      var periodicTimer = new PeriodicTimer(timeSpan);
-      while (await periodicTimer.WaitForNextTickAsync())
-      {
-        action();
-      }
-    }
 
     private void ScreenUpdate()
     {
@@ -73,6 +63,7 @@ namespace ParkAir___Assignment
       }
       else keyOveride();
 
+      ScreenUpdate();
       InputHandler();
     } 
   }
