@@ -8,7 +8,7 @@ public class Gui
   public string? menuTitle = null;
   private readonly List<string> _debug = new() { "", "" };
   private Task? _inputTaskHandler;
-  private int _tabIndex;
+  internal int _tabIndex;
   private int _lines = 0;
   private const bool CURSOR = false;
   public List<ITab> Tabs { get; } = new();
@@ -211,7 +211,7 @@ public class Gui
         $"{(tabTop.Length > 0 ? $"{tabTop}\n" : "")}{(tabMiddle.Length > 0 ? $"{tabMiddle}\n" : "")}{(tabBottom.Length > 0 ? $"{tabBottom}" : "")}";
   }
 
-  private void ScreenUpdate()
+  internal void ScreenUpdate()
   {
     Console.Title = $"{(menuTitle is not null ? $"{menuTitle} - " : "")}{Tabs[_tabIndex].TabName}";
     string tabs = GenerateTabs(this);

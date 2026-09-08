@@ -10,6 +10,19 @@ public class SyslogTab : ITab
   public string ScreenString => "";
   public bool Tabber => true;
   public Gui? _gui { get; private set; }
+  
+  private readonly Thread t_backgroundListenerThread;
+  private void ScreenRefresh()
+  {
+    while (true)
+    {
+      if (_gui?.Tabs[_gui._tabIndex] == this)
+      {
+        _gui?.ScreenUpdate();
+      }
+      Thread.Sleep((int)3E3);
+    }
+  }
 
   public SyslogTab(SettingsTab settings)
   {
@@ -19,6 +32,8 @@ public class SyslogTab : ITab
       );
     
     this.sysServer.Start();
+    this.t_backgroundListenerThread = new(new ThreadStart(ScreenRefresh));
+    this.t_backgroundListenerThread.Start();
   }
 
   public void HandleKeypress(ConsoleKeyInfo key)
@@ -27,7 +42,15 @@ public class SyslogTab : ITab
 
   public string Screen()
   {
-    return "";
+    List<SysMessage> logs = this.sysServer.GetLogs();
+    List<SysMessage> lastTen = logs.Skip(Math.Max(0, logs.Count - 17)).ToList();
+    string screenReturn = "";
+    foreach (SysMessage log in lastTen)
+    {
+      screenReturn += log.sysString + "\n";
+    }
+
+    return screenReturn;
   }
 
   public void Register(Gui gui)

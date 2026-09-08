@@ -30,6 +30,11 @@ namespace ParkAir___Assignment.Syslog
       this.t_UdpListenerThread = new(new ThreadStart(RunUdp));
     }
 
+    public List<SysMessage> GetLogs()
+    {
+      return new(this._log);
+    }
+
     public void Start()
     {
       switch (this._listeningType)

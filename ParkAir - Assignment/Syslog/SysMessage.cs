@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ParkAir___Assignment.Syslog
 {
-  internal class SysMessage
+  public class SysMessage
   {
     public string sysString { get; private set; }
 
