@@ -1,4 +1,7 @@
-﻿namespace ParkAir___Assignment.Menus.SettingsHandlers
+﻿using System.Collections.Generic;
+using System;
+
+namespace ParkAir___Assignment.Menus.SettingsHandlers
 {
   public class Color
   {
@@ -22,13 +25,36 @@
       ["WHITE"] = "\x1b[97m",
       ["DEFAULT"] = "\x1b[0m"
     };
+    private List<string> _order = new() {"BLACK", "DARK_RED", "DARK_GREEN", "DARK_YELLOW", "DARK_BLUE", "DARK_MAGENTA", "DARK_CYAN", "DARK_WHITE", "BRIGHT_BLACK", "BRIGHT_RED", "BRIGHT_GREEN", "BRIGHT_YELLOW", "BRIGHT_BLUE", "BRIGHT_MAGENTA", "BRIGHT_CYAN", "WHITE"};
+    
+    int mod(int k, int n) { return ((k %= n) < 0) ? k + n : k; }
 
+    public string Next(string current)
+    {
+      string response = "Default";
+      int currentIndex = this._order.IndexOf(current);
+      if (currentIndex > -1)
+      {
+        response = _order[mod(currentIndex + 1, _order.Count)];
+      }
+      return response;
+    }
+
+    public string Previous(string current)
+    {
+      string response = "Default";
+      int currentIndex = this._order.IndexOf(current);
+      if (currentIndex > -1)
+      {
+        response = _order[mod(currentIndex - 1, _order.Count)];
+      }
+      return response;
+    }
 
     public string? FromSetting(string value)
     {
       string? response = null;
       if (this._colors.ContainsKey(value)) response = this._colors[value];
-
       return response;
     }
   }
