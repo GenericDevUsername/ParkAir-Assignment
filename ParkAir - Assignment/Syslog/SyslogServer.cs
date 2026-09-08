@@ -1,5 +1,4 @@
 ﻿using System.Net;
-using System.Runtime.CompilerServices;
 
 namespace ParkAir___Assignment.Syslog
 {
