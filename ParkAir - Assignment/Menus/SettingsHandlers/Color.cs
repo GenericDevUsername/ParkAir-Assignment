@@ -25,9 +25,9 @@ public class Color
 
   private readonly List<string> _order = new()
     {
-        "BLACK", "DARK_RED", "DARK_GREEN", "DARK_YELLOW", "DARK_BLUE", "DARK_MAGENTA", "DARK_CYAN", "DARK_WHITE",
-        "BRIGHT_BLACK", "BRIGHT_RED", "BRIGHT_GREEN", "BRIGHT_YELLOW", "BRIGHT_BLUE", "BRIGHT_MAGENTA", "BRIGHT_CYAN",
-        "WHITE"
+      "BLACK", "DARK_RED", "DARK_GREEN", "DARK_YELLOW", "DARK_BLUE", "DARK_MAGENTA", "DARK_CYAN", "DARK_WHITE",
+      "BRIGHT_BLACK", "BRIGHT_RED", "BRIGHT_GREEN", "BRIGHT_YELLOW", "BRIGHT_BLUE", "BRIGHT_MAGENTA", "BRIGHT_CYAN",
+      "WHITE"
     };
 
   private static int Mod(int k, int n)
