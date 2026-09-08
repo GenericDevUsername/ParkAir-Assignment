@@ -6,16 +6,23 @@ namespace ParkAir___Assignment.Syslog
   {
     private IPAddress _listeningIP;
     private int _listeningPort;
+    private string _listeningType;
 
     private readonly Thread t_UdpListenerThread;
     private readonly Thread t_TcpListenerThread;
 
-    public SyslogServer(IPAddress? ip = null, int port = 514)
+    public SyslogServer(IPAddress? ip = null, int port = 514, string type = "BOTH")
     {
+      if (type != "UDP" && type != "TCP" && type != "BOTH")
+      {
+        Exception error = new Exception("Type must be UDP, TCP or BOTH");
+        throw error;
+      }
       ip ??= IPAddress.Parse("127.0.0.1");
 
       this._listeningIP = ip;
       this._listeningPort = port;
+      this._listeningType = type;
       
       this.t_TcpListenerThread = new(new ThreadStart(RunTcp));
       this.t_UdpListenerThread = new(new ThreadStart(RunUdp));
@@ -23,7 +30,21 @@ namespace ParkAir___Assignment.Syslog
 
     public void Start()
     {
-
+      switch (this._listeningType)
+      {
+        case "UDP":
+          RunUdp();
+          break;
+        
+        case "TCP":
+          RunTcp();
+          break;
+        
+        case "BOTH":
+          RunTcp();
+          RunUdp();
+          break;
+      }
     }
     private void RunTcp()
     {
