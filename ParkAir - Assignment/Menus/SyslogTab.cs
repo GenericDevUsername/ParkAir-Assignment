@@ -54,6 +54,16 @@ public class SyslogTab : ITab
     t_backgroundListenerThread.Start();
   }
 
+  public void RefreshNetwork(SettingsTab settings)
+  {
+    sysServer = new SyslogServer(IPAddress.Parse((string)settings.Settings.SelectToken("Network.ListeningIp.Selected")),
+                                  (int)settings.Settings.SelectToken("Network.ListeningPort.Selected"),
+                                  (string)settings.Settings.SelectToken("Network.ListeningType.Selected")
+      );
+    sysServer.Start();
+
+  }
+
   public void HandleKeypress(ConsoleKeyInfo key)
   {
   }

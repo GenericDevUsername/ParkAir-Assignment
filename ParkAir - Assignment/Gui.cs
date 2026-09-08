@@ -43,7 +43,7 @@ public class Gui
 
 
   public string Input(int left = -1, int top = -1, string prefill = "", string prompt = "", char? spaceholder = null,
-      int? min = null, int? max = null, int length = -1, Regex? regexCheck = null, string customError = "")
+      int? min = null, int? max = null, int length = -1, Regex? regexCheck = null, string customError = "", List<string>? autocomplete = null)
   {
     // Assign dynamic location defaults based on current cursor position
     bool currentCursorVisibility = Console.CursorVisible;
@@ -68,6 +68,25 @@ public class Gui
     string errorMsg = "";
     while (intercept)
     {
+      // refresh screen
+      this.ScreenUpdate();
+      if (autocomplete is not null)
+      {
+        Console.SetCursorPosition(left, top+1);
+        Console.WriteLine($"\u001b[100;30mAutocomplete\u001b[0m");
+        List<string> resultsList = new List<string>();
+        resultsList.AddRange(autocomplete.Where(r => r.StartsWith(inputOutput)));
+        if (resultsList.Count == 0)
+        {
+          Console.SetCursorPosition(left, top+2);
+          Console.WriteLine($"\u001b[100;97mNo Recommendations Found\u001b[0m");
+        }
+        for (int i = 0; i < resultsList.Count; i++)
+        {
+          Console.SetCursorPosition(left, top+2+i);
+          Console.WriteLine($"\u001b[100;97m{resultsList[i]}\u001b[0m");
+        }
+      }
       // update indexes
       int maxIndex = inputOutput.Length;
 
@@ -75,7 +94,7 @@ public class Gui
       Console.SetCursorPosition(left, top); // Position cursor at provided location
       Console.Write(
           $"{prompt}{(errorMsg == "" ? $"{(spaceholder is not null ? inputOutput.Replace(' ', Convert.ToChar(spaceholder)) : inputOutput)}{(spaceholder is not null ? new string(Convert.ToChar(spaceholder), length - inputOutput.Length) : "")}" : $"\u001b[91m{errorMsg}\u001b[0m")}");
-
+      
       Console.SetCursorPosition(left + prompt.Length + currentIndex + 1, top);
       if ((length < 0 || currentIndex + 1 != length) || (max is null || currentIndex + 1 != max))
         Console.CursorVisible = true;

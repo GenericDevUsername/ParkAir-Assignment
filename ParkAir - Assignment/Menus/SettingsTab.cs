@@ -1,6 +1,8 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using ParkAir___Assignment.Menus.SettingsHandlers;
+using System.Net;
+using System.Net.NetworkInformation;
 using System.Text.RegularExpressions;
 
 namespace ParkAir___Assignment.Menus;
@@ -158,10 +160,15 @@ public class SettingsTab : ITab
         break;
 
       case "IP":
+        // Get host name
+        List<IPAddress> localIPs = (from netInterface in NetworkInterface.GetAllNetworkInterfaces() select netInterface.GetIPProperties() into ipProps from addr in ipProps.UnicastAddresses select addr.Address).ToList();
+
+        List<string> autocompleteList = localIPs.Select(ip => ip.ToString()).ToList();
+        
         string newIp = _gui.Input(top: setting.Line, left: 64, prefill: (string)setting.Value["Selected"],
-            spaceholder: '_', max: 26, length: 26, customError: "Not a valid IP!",
+            spaceholder: '_', max: 26, length: 26, customError: "Not a valid IP!", autocomplete: autocompleteList,
             regexCheck: new Regex(
-                @"^(((([lL]ocal[hH]ost)|(([2]([0-4][0-9]|[5][0-5])|[0-1]?[0-9]?[0-9])[.]){3}(([2]([0-4][0-9]|[5][0-5])|[0-1]?[0-9]?[0-9]))))+)$"));
+                @"^((((([lL]ocal[hH]ost)|(([2]([0-4][0-9]|[5][0-5])|[0-1]?[0-9]?[0-9])[.]){3}(([2]([0-4][0-9]|[5][0-5])|[0-1]?[0-9]?[0-9]))))+))|((([0-9a-fA-F]{0,4})\:){2,7})([0-9a-fA-F]{0,4})$"));
         setting.Set(newIp);
         break;
 
@@ -172,6 +179,10 @@ public class SettingsTab : ITab
                 @"^([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$"));
         setting.Set(newPort);
         break;
+    }
+    if ((bool)setting.Value["RequiresRestart"])
+    {
+
     }
   }
 
