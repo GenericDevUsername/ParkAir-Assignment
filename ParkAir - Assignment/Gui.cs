@@ -8,7 +8,7 @@ public class Gui
     private readonly List<string> _debug = new() { "", "" };
     private Task? _inputTaskHandler;
     private int _tabIndex;
-    private const bool Cursor = false;
+    private const bool CURSOR = false;
     public List<ITab> Tabs { get; } = new();
 
 
@@ -24,6 +24,7 @@ public class Gui
         _inputTaskHandler = new Task(InputHandler);
         _inputTaskHandler.Start();
         ScreenUpdate();
+        while (true) Thread.Sleep(1);
     }
 
 
@@ -218,7 +219,7 @@ public class Gui
                     break;
             }
 
-        Console.CursorVisible = Cursor;
+        Console.CursorVisible = CURSOR;
         if (Tabs.Count > 0) Tabs[_tabIndex].HandleKeypress(key);
 
         // DEBUG STRING UPDATER - REMOVE LATER

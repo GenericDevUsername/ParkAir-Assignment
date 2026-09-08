@@ -19,7 +19,6 @@ internal static class Program
         menuHandler.AddTab(new SyslogTab());
 
         menuHandler.Start();
-        while (true) Thread.Sleep(1);
     }
 
     private static SettingsTab InitSettings(string fp)

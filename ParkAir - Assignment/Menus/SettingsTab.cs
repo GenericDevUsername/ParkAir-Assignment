@@ -68,12 +68,12 @@ public class SettingsTab : ITab
                 break;
 
             case ConsoleKey.RightArrow:
-                if (CurrentIndex >= 0 && CurrentIndex <= _selectionIndex.Count)
+                if (CurrentIndex >= 0 && CurrentIndex < _selectionIndex.Count)
                     ChangeSetting(_selectionIndex[CurrentIndex], key);
                 break;
 
             case ConsoleKey.LeftArrow:
-                if (CurrentIndex >= 0 && CurrentIndex <= _selectionIndex.Count)
+                if (CurrentIndex >= 0 && CurrentIndex < _selectionIndex.Count)
                     ChangeSetting(_selectionIndex[CurrentIndex], key);
                 break;
         }
