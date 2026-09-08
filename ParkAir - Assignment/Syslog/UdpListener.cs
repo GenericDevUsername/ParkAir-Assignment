@@ -2,55 +2,54 @@
 using System.Net.Sockets;
 using System.Text;
 
-namespace ParkAir___Assignment.Syslog
+namespace ParkAir___Assignment.Syslog;
+
+internal class UdpListener
 {
-  internal class UdpListener
+  private IPEndPoint _RemoteIPEndpoint;
+  private readonly SyslogServer _server;
+  private UdpClient _udpClientListener;
+
+  public UdpListener(SyslogServer server)
   {
-    private UdpClient _udpClientListener;
-    private IPEndPoint _RemoteIPEndpoint;
-    private SyslogServer _server;
+    _server = server;
+    _udpClientListener = new UdpClient(server._listeningPort);
+    _RemoteIPEndpoint = new IPEndPoint(IPAddress.Any, server._listeningPort);
 
-    public UdpListener(SyslogServer server)
+    _udpClientListener.BeginReceive(Recv, null);
+  }
+
+  public void Restart()
+  {
+    _udpClientListener.Dispose();
+    _udpClientListener.Close();
+
+    _udpClientListener = new UdpClient(_server._listeningPort);
+    _RemoteIPEndpoint = new IPEndPoint(IPAddress.Any, _server._listeningPort);
+
+    _udpClientListener.BeginReceive(Recv, null);
+  }
+
+  private void Recv(IAsyncResult res)
+  {
+    try
     {
-      this._server = server;
-      this._udpClientListener = new UdpClient(server._listeningPort);
-      this._RemoteIPEndpoint = new IPEndPoint(IPAddress.Any, server._listeningPort);
+      byte[] received = _udpClientListener.EndReceive(res, ref _RemoteIPEndpoint);
+      string returnData = Encoding.ASCII.GetString(received);
 
-      this._udpClientListener.BeginReceive(new AsyncCallback(Recv), null);
+
+      _server._log.Add(new SysMessage(returnData));
+
+      _udpClientListener.BeginReceive(Recv, null);
+    }
+    catch (SocketException)
+    {
+      // ignore
+    }
+    catch (ObjectDisposedException)
+    {
+      //ignore
     }
 
-    public void Restart()
-    {
-      this._udpClientListener.Dispose();
-      this._udpClientListener.Close();
-
-      this._udpClientListener = new UdpClient(this._server._listeningPort);
-      this._RemoteIPEndpoint = new IPEndPoint(IPAddress.Any, this._server._listeningPort);
-      
-      this._udpClientListener.BeginReceive(new AsyncCallback(Recv), null);
-    }
-    
-    private void Recv(IAsyncResult res)
-    {
-      try
-      {
-        byte[] received = this._udpClientListener.EndReceive(res, ref this._RemoteIPEndpoint);
-        string returnData = Encoding.ASCII.GetString(received);
-
-
-        this._server._log.Add(new SysMessage(returnData));
-
-        this._udpClientListener.BeginReceive(new AsyncCallback(Recv), null);
-      }
-      catch (System.Net.Sockets.SocketException)
-      {
-        // ignore
-      }
-      catch (System.ObjectDisposedException)
-      {
-        //ignore
-      }
-
-    }
   }
 }

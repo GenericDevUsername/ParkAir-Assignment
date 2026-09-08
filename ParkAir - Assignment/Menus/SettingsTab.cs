@@ -9,11 +9,11 @@ namespace ParkAir___Assignment.Menus;
 
 public class SettingsTab : ITab
 {
-  private int _resetter;
   private readonly List<Setting> _selectionIndex = new();
   private readonly List<SettingsCategory> _settings = new();
 
   public readonly string SettingsFile;
+  private int _resetter;
 
   public SettingsTab(string fp)
   {
@@ -168,7 +168,7 @@ public class SettingsTab : ITab
         List<IPAddress> localIPs = (from netInterface in NetworkInterface.GetAllNetworkInterfaces() select netInterface.GetIPProperties() into ipProps from addr in ipProps.UnicastAddresses select addr.Address).ToList();
 
         List<string> autocompleteList = localIPs.Select(ip => ip.ToString()).ToList();
-        
+
         string newIp = _gui.Input(top: setting.Line, left: 64, prefill: (string)setting.Value["Selected"],
             spaceholder: '_', max: 26, length: 26, customError: "Not a valid IP!", autocomplete: autocompleteList,
             regexCheck: new Regex(
@@ -186,13 +186,14 @@ public class SettingsTab : ITab
     }
     if ((bool)setting.Value["RequiresRestart"])
     {
-      this._gui.RefreshSettings();
+      _gui.RefreshSettings();
     }
   }
 
   private void ResetToDefaults()
   {
     foreach (Setting setting in _selectionIndex) setting.Reset();
+    this._gui.RefreshSettings();
   }
 
   private string SettingString(Setting setting)

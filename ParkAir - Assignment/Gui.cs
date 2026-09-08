@@ -1,26 +1,25 @@
 ﻿using ParkAir___Assignment.Menus;
-using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 
 namespace ParkAir___Assignment;
 
 public class Gui
 {
-  public string? menuTitle = null;
+  private const bool CURSOR = false;
   internal readonly List<string> _debug = new() { "", "", "" };
   private Task? _inputTaskHandler;
+  private int _lines;
   internal int _tabIndex;
-  private int _lines = 0;
-  private const bool CURSOR = false;
-  public List<ITab> Tabs { get; } = new();
-  private Thread t_menuThread;
+  public string? menuTitle;
+  private readonly Thread t_menuThread;
 
 
   public Gui(string? title = null)
   {
-    this.t_menuThread = new(new ThreadStart(RunMenu));
+    t_menuThread = new Thread(RunMenu);
     menuTitle = title;
   }
+  public List<ITab> Tabs { get; } = new();
 
   public void AddTab(ITab tab)
   {
@@ -30,7 +29,7 @@ public class Gui
 
   public void Start()
   {
-    this.t_menuThread.Start();
+    t_menuThread.Start();
   }
 
   private void RunMenu()
@@ -44,9 +43,9 @@ public class Gui
 
   public void RefreshSettings()
   {
-    foreach (ITab tab in this.Tabs.Where(tab => tab.Restart))
+    foreach (ITab tab in Tabs.Where(tab => tab.Restart))
     {
-      this._debug[2] = "reset"; 
+      _debug[2] = "reset";
       tab.RestartTab();
     }
   }
@@ -68,36 +67,37 @@ public class Gui
     // Check if the prefill already surpasses the provided max char count, If it does throw an error
     if (max is not null && max < prefill.Length)
     {
-      Exception error = new Exception("Max is smaller than provided prefill");
+      Exception error = new("Max is smaller than provided prefill");
       throw error;
     }
 
-    
+
     bool intercept = true;
     bool cancel = false;
     string errorMsg = "";
     while (intercept)
     {
       // refresh screen
-      this.ScreenUpdate();
+      ScreenUpdate();
       if (autocomplete is not null)
       {
-        Console.SetCursorPosition(left, top+1);
-        Console.WriteLine($"\u001b[100;30mAutocomplete\u001b[0m");
-        List<string> resultsList = new List<string>();
+        Console.SetCursorPosition(left, top + 1);
+        Console.WriteLine("\u001b[100;30mAutocomplete\u001b[0m");
+        List<string> resultsList = new();
         resultsList.AddRange(autocomplete.Where(r => r.StartsWith(inputOutput)));
         if (resultsList.Count == 0)
         {
-          Console.SetCursorPosition(left, top+2);
-          Console.WriteLine($"\u001b[100;97mNo Recommendations Found\u001b[0m");
+          Console.SetCursorPosition(left, top + 2);
+          Console.WriteLine("\u001b[100;97mNo Recommendations Found\u001b[0m");
         }
         for (int i = 0; i < resultsList.Count && i < 11; i++)
         {
-          Console.SetCursorPosition(left, top+2+i);
+          Console.SetCursorPosition(left, top + 2 + i);
           if (i < 10)
           {
             Console.WriteLine($"\u001b[100;97m{resultsList[i]}\u001b[0m");
-          } else Console.WriteLine($"\u001b[100;97mAnd {resultsList.Count - i+1} more...\u001b[0m");
+          }
+          else Console.WriteLine($"\u001b[100;97mAnd {resultsList.Count - i + 1} more...\u001b[0m");
         }
       }
       Console.Write(" ");
@@ -108,9 +108,9 @@ public class Gui
       Console.SetCursorPosition(left, top); // Position cursor at provided location
       Console.Write(
           $"{prompt}{(errorMsg == "" ? $"{(spaceholder is not null ? inputOutput.Replace(' ', Convert.ToChar(spaceholder)) : inputOutput)}{(spaceholder is not null ? new string(Convert.ToChar(spaceholder), length - inputOutput.Length) : "")}" : $"\u001b[91m{errorMsg}\u001b[0m")}");
-      
+
       Console.SetCursorPosition(left + prompt.Length + currentIndex + 1, top);
-      if ((length < 0 || currentIndex + 1 != length) || (max is null || currentIndex + 1 != max))
+      if (length < 0 || currentIndex + 1 != length || max is null || currentIndex + 1 != max)
         Console.CursorVisible = true;
 
       if (errorMsg != "")
@@ -174,7 +174,7 @@ public class Gui
             inputOutput = inputOutput.Insert(currentIndex + 1, key.KeyChar.ToString());
             currentIndex++;
           }
-          else if (key.Key == ConsoleKey.Spacebar&&
+          else if (key.Key == ConsoleKey.Spacebar &&
                    (max is null || inputOutput.Length + 1 <= max) &&
                    (length < 0 || inputOutput.Length + 1 <= length))
           {
@@ -219,12 +219,12 @@ public class Gui
           tabBottom = new string(lineThreeArray);
         }
         else if (tab == Tabs[Tabs.Count - 1 < 0 ? 0 : Tabs.Count - 1] &&
-                  tabBottom.Length - (Tabs[_tabIndex].Tabber ? 0 : 9) == 92)
+                 tabBottom.Length - (Tabs[_tabIndex].Tabber ? 0 : 9) == 92)
         {
           tabBottom = $"{tabBottom.Remove(tabBottom.Length - 1, 1)}┤";
         }
         else if (tab == Tabs[Tabs.Count - 1 < 0 ? 0 : Tabs.Count - 1] &&
-                  tabBottom.Length - (Tabs[_tabIndex].Tabber ? 0 : 9) > 92)
+                 tabBottom.Length - (Tabs[_tabIndex].Tabber ? 0 : 9) > 92)
         {
           tabBottom = $"{tabBottom.Remove(tabBottom.Length - 1, 1)}┘";
           char[] lineThreeArray = tabBottom.ToCharArray();
@@ -253,16 +253,16 @@ public class Gui
     screenLines.AddRange(_debug);
     int newLines = screenLines.Count;
     for (int i = 0; i < screenLines.Count; i++)
-      screenLines[i] = $"{screenLines[i]}{new string(' ', (Console.BufferWidth - screenLines[i].Length < 0 ? 0 : Console.BufferWidth - screenLines[i].Length ))}";
-      
-    for (int i = 0; i < this._debug.Count + this._lines - newLines; i++)
+      screenLines[i] = $"{screenLines[i]}{new string(' ', Console.BufferWidth - screenLines[i].Length < 0 ? 0 : Console.BufferWidth - screenLines[i].Length)}";
+
+    for (int i = 0; i < _debug.Count + _lines - newLines; i++)
       screenLines.Add($"{new string(' ', Console.BufferWidth)}");
 
-    this._lines = newLines;
+    _lines = newLines;
 
     Console.SetCursorPosition(0, 0);
     Console.WriteLine($"{string.Join('\n', screenLines)}");
-    Console.SetCursorPosition(0, screenLines.Count + this._debug.Count);
+    Console.SetCursorPosition(0, screenLines.Count + _debug.Count);
   }
 
   private void InputHandler()

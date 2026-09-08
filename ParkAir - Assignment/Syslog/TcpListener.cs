@@ -2,5 +2,7 @@
 
 internal class TcpListener
 {
-  public void Stop(){}
+  public void Stop()
+  {
+  }
 }
