@@ -26,13 +26,13 @@ namespace ParkAir___Assignment.Syslog
       this._listeningPort = port;
       this._listeningType = type;
       
-      this.t_TcpListenerThread = new(new ThreadStart(RunTcp));
-      this.t_UdpListenerThread = new(new ThreadStart(RunUdp));
+      this.t_TcpListenerThread = new Thread(RunTcp);
+      this.t_UdpListenerThread = new Thread(RunUdp);
     }
 
     public List<SysMessage> GetLogs()
     {
-      return new(this._log);
+      return new List<SysMessage>(this._log);
     }
 
     public void Start()
@@ -59,7 +59,7 @@ namespace ParkAir___Assignment.Syslog
     }
     private void RunUdp()
     {
-      UdpListener udpServerListener = new UdpListener(this);
+      UdpListener udpServerListener = new(this);
     }
 
 

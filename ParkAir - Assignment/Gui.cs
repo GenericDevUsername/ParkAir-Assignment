@@ -6,7 +6,7 @@ namespace ParkAir___Assignment;
 public class Gui
 {
   public string? menuTitle = null;
-  private readonly List<string> _debug = new() { "", "" };
+  internal readonly List<string> _debug = new() { "", "", "" };
   private Task? _inputTaskHandler;
   internal int _tabIndex;
   private int _lines = 0;

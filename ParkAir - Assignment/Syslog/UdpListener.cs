@@ -11,7 +11,7 @@ namespace ParkAir___Assignment.Syslog
 
     public UdpListener(SyslogServer server)
     {
-      this._udpClientListener = new(server._listeningPort);
+      this._udpClientListener = new UdpClient(server._listeningPort);
       this._RemoteIPEndpoint = new IPEndPoint(IPAddress.Any, server._listeningPort);
       
       while (true)
@@ -21,7 +21,8 @@ namespace ParkAir___Assignment.Syslog
         string returnData = Encoding.ASCII.GetString(receiveBytes);
 
 
-        server._log.Add(new(returnData));
+        server._log.Add(new SysMessage(returnData));
+
         Thread.Sleep(1);
       }
     }
