@@ -29,6 +29,7 @@ public class SettingsTab : ITab
   public JObject Settings { get; }
   public string TabName { get; set; } = "Settings";
   public string ScreenString { get; } = "";
+  public bool Restart { get; } = false;
   public bool Tabber { get; private set; } = true;
   public Gui? _gui { get; private set; }
 
@@ -83,6 +84,9 @@ public class SettingsTab : ITab
     Tabber = CurrentIndex < 0;
   }
 
+  public void RestartTab()
+  {
+  }
   public string Screen()
   {
     List<string> screenLines = new();
@@ -182,7 +186,7 @@ public class SettingsTab : ITab
     }
     if ((bool)setting.Value["RequiresRestart"])
     {
-
+      this._gui.RefreshSettings();
     }
   }
 

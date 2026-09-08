@@ -1,17 +1,22 @@
 ﻿using System.Net;
+using System.Runtime.CompilerServices;
 
 namespace ParkAir___Assignment.Syslog
 {
   public class SyslogServer
   {
     internal IPAddress _listeningIP;
-    internal readonly int _listeningPort;
+    internal int _listeningPort;
     internal List<SysMessage> _log = new();
+    public bool Shutdown { get; private set; } = false;
 
     private readonly string _listeningType;
 
-    private readonly Thread t_UdpListenerThread;
-    private readonly Thread t_TcpListenerThread;
+    private Thread t_UdpListenerThread;
+    private UdpListener? _udpServerListener;
+    
+    private Thread t_TcpListenerThread;
+    private TcpListener? _tcpServerListener;
 
     public SyslogServer(IPAddress? ip = null, int port = 514, string type = "BOTH")
     {
@@ -27,8 +32,10 @@ namespace ParkAir___Assignment.Syslog
       this._listeningType = type;
       
       this.t_TcpListenerThread = new Thread(RunTcp);
+      
       this.t_UdpListenerThread = new Thread(RunUdp);
-    }
+    
+  }
 
     public List<SysMessage> GetLogs()
     {
@@ -54,13 +61,19 @@ namespace ParkAir___Assignment.Syslog
       }
     }
 
+    public void Restart()
+    {
+      this._udpServerListener?.Restart();
+      this._tcpServerListener?.Stop();
+    }
+
     private void RunTcp()
     {
       
     }
     private void RunUdp()
-    {
-      UdpListener udpServerListener = new(this);
+    { 
+      this._udpServerListener = new(this);
     }
 
 

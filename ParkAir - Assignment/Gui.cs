@@ -1,4 +1,5 @@
 ﻿using ParkAir___Assignment.Menus;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 
 namespace ParkAir___Assignment;
@@ -41,6 +42,15 @@ public class Gui
     while (true) Thread.Sleep(1);
   }
 
+  public void RefreshSettings()
+  {
+    foreach (ITab tab in this.Tabs.Where(tab => tab.Restart))
+    {
+      this._debug[2] = "reset"; 
+      tab.RestartTab();
+    }
+  }
+
 
   public string Input(int left = -1, int top = -1, string prefill = "", string prompt = "", char? spaceholder = null,
       int? min = null, int? max = null, int length = -1, Regex? regexCheck = null, string customError = "", List<string>? autocomplete = null)
@@ -81,12 +91,16 @@ public class Gui
           Console.SetCursorPosition(left, top+2);
           Console.WriteLine($"\u001b[100;97mNo Recommendations Found\u001b[0m");
         }
-        for (int i = 0; i < resultsList.Count; i++)
+        for (int i = 0; i < resultsList.Count && i < 11; i++)
         {
           Console.SetCursorPosition(left, top+2+i);
-          Console.WriteLine($"\u001b[100;97m{resultsList[i]}\u001b[0m");
+          if (i < 10)
+          {
+            Console.WriteLine($"\u001b[100;97m{resultsList[i]}\u001b[0m");
+          } else Console.WriteLine($"\u001b[100;97mAnd {resultsList.Count - i+1} more...\u001b[0m");
         }
       }
+      Console.Write(" ");
       // update indexes
       int maxIndex = inputOutput.Length;
 

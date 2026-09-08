@@ -12,8 +12,9 @@ public class SyslogTab : ITab
   public string ScreenString => "";
   public bool Tabber => true;
   public Gui? _gui { get; private set; }
+  public bool Restart { get; } = true;
   
-  private readonly JObject _settings;
+  private readonly SettingsTab _settings;
 
   private readonly Dictionary<int, string> _color = new()
   {
@@ -47,20 +48,18 @@ public class SyslogTab : ITab
                                       (string)settings.Settings.SelectToken("Network.ListeningType.Selected")
       );
     
-    this._settings = settings.Settings;
+    this._settings = settings;
 
     sysServer.Start();
     t_backgroundListenerThread = new Thread(ScreenRefresh);
     t_backgroundListenerThread.Start();
   }
 
-  public void RefreshNetwork(SettingsTab settings)
+  public void RestartTab()
   {
-    sysServer = new SyslogServer(IPAddress.Parse((string)settings.Settings.SelectToken("Network.ListeningIp.Selected")),
-                                  (int)settings.Settings.SelectToken("Network.ListeningPort.Selected"),
-                                  (string)settings.Settings.SelectToken("Network.ListeningType.Selected")
-      );
-    sysServer.Start();
+    sysServer._listeningPort = (int)this._settings.Settings.SelectToken("Network.ListeningPort.Selected");
+    sysServer._listeningIP = IPAddress.Parse((string)this._settings.Settings.SelectToken("Network.ListeningIp.Selected"));
+    sysServer.Restart();
 
   }
 
@@ -75,7 +74,7 @@ public class SyslogTab : ITab
     string screenReturn = "";
     foreach (SysMessage log in lastTen)
     {
-      string color = new SettingsHandlers.Color().FromSetting((string)this._settings.SelectToken($"Colors.{this._color[(int)log.priority - (((int)log.priority / 8) * 8)]}.Selected"));
+      string color = new SettingsHandlers.Color().FromSetting((string)this._settings.Settings.SelectToken($"Colors.{this._color[(int)log.priority - (((int)log.priority / 8) * 8)]}.Selected"));
       screenReturn += $"│ {log.timestamp.ToLongTimeString()} │{color} {$"[{this._color[(int)log.priority - (((int)log.priority/8)*8)].ToUpper()}]",-15}\x1b[0m │ {(log.hostname != "-" ? log.hostname : "None")} {(log.message.Length > 1 ? log.message : "None")}\x1b[0m\n";
       this._gui._debug[2] = log.sysString;
     }
