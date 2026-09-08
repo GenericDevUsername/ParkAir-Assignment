@@ -50,7 +50,8 @@ public class Gui
     if (top == -1 || left == -1) (left, top) = Console.GetCursorPosition();
     if (length == -1) length = Console.WindowWidth - (left >= 0 ? left : 0);
 
-    // Pre define variables based on above information (if a prefill is provided we must start the function at a point where it appears this input has already been typed in
+    // Pre define variables based on above information
+    // (if a prefill is provided we must start the function at a point where it appears this input has already been typed in)
     string inputOutput = prefill == "" ? "" : prefill;
     int currentIndex = prefill == "" ? 0 : prefill.Length - 1;
 
@@ -61,7 +62,7 @@ public class Gui
       throw error;
     }
 
-    // Position cursor at provided location
+    
     bool intercept = true;
     bool cancel = false;
     string errorMsg = "";
@@ -71,9 +72,9 @@ public class Gui
       int maxIndex = inputOutput.Length;
 
       Console.CursorVisible = false;
-      Console.SetCursorPosition(left, top);
+      Console.SetCursorPosition(left, top); // Position cursor at provided location
       Console.Write(
-          $"{prompt}{(errorMsg == "" ? $"{inputOutput}{(spaceholder is not null ? new string(Convert.ToChar(spaceholder), length - inputOutput.Length) : "")}" : $"\u001b[91m{errorMsg}\u001b[0m")}");
+          $"{prompt}{(errorMsg == "" ? $"{(spaceholder is not null ? inputOutput.Replace(' ', Convert.ToChar(spaceholder)) : inputOutput)}{(spaceholder is not null ? new string(Convert.ToChar(spaceholder), length - inputOutput.Length) : "")}" : $"\u001b[91m{errorMsg}\u001b[0m")}");
 
       Console.SetCursorPosition(left + prompt.Length + currentIndex + 1, top);
       if ((length < 0 || currentIndex + 1 != length) || (max is null || currentIndex + 1 != max))
@@ -87,56 +88,69 @@ public class Gui
       }
 
       ConsoleKeyInfo key = Console.ReadKey(true);
-      if (key.Key == ConsoleKey.Escape)
+      switch (key.Key)
       {
-        intercept = false;
-        cancel = true;
-      }
-      else if (key.Key == ConsoleKey.Enter)
-      {
-        if ((min is null || inputOutput.Length > min) && (max is null || inputOutput.Length <= max) &&
-            (length < 0 || inputOutput.Length <= length) &&
-            (regexCheck is null || regexCheck.Matches(inputOutput).Count > 0))
-        {
+        case ConsoleKey.Escape:
           intercept = false;
-        }
-
-        if (!(min is null || inputOutput.Length > min))
-          errorMsg = "Input too short!";
-        else if (!(max is null || inputOutput.Length <= max) || !(length < 0 || inputOutput.Length <= length))
-          errorMsg = "Input too long!";
-        else if (regexCheck is not null && regexCheck.Matches(inputOutput).Count <= 0)
-          errorMsg = customError == "" ? "Failed regex!" : customError;
-      }
-      else if (key.Key == ConsoleKey.Backspace && currentIndex >= 0)
-      {
-        currentIndex--;
-        inputOutput = inputOutput.Remove(currentIndex + 1, 1);
-      }
-      else if (key.Key == ConsoleKey.Delete && currentIndex + 1 < maxIndex)
-      {
-        inputOutput = inputOutput.Remove(currentIndex + 1, 1);
-      }
-      else if ((key.Key == ConsoleKey.LeftArrow && currentIndex >= 0) ||
-                (key.Key == ConsoleKey.RightArrow && currentIndex + 1 < maxIndex))
-      {
-        switch (key.Key)
+          cancel = true;
+          break;
+        case ConsoleKey.Enter:
         {
-          case ConsoleKey.LeftArrow:
-            currentIndex--;
-            break;
+          if ((min is null || inputOutput.Length > min) && (max is null || inputOutput.Length <= max) &&
+              (length < 0 || inputOutput.Length <= length) &&
+              (regexCheck is null || regexCheck.Matches(inputOutput).Count > 0))
+          {
+            intercept = false;
+          }
 
-          case ConsoleKey.RightArrow:
-            currentIndex++;
-            break;
+          if (!(min is null || inputOutput.Length > min))
+            errorMsg = "Input too short!";
+          else if (!(max is null || inputOutput.Length <= max) || !(length < 0 || inputOutput.Length <= length))
+            errorMsg = "Input too long!";
+          else if (regexCheck is not null && regexCheck.Matches(inputOutput).Count <= 0)
+            errorMsg = customError == "" ? "Failed regex!" : customError;
+          break;
         }
-      }
-      else if ((char.IsLetterOrDigit(key.KeyChar) || char.IsPunctuation(key.KeyChar)) &&
-                (max is null || inputOutput.Length + 1 <= max) &&
-                (length < 0 || inputOutput.Length + 1 <= length))
-      {
-        inputOutput = inputOutput.Insert(currentIndex + 1, key.KeyChar.ToString());
-        currentIndex++;
+        case ConsoleKey.Backspace when currentIndex >= 0:
+          currentIndex--;
+          inputOutput = inputOutput.Remove(currentIndex + 1, 1);
+          break;
+        case ConsoleKey.Delete when currentIndex + 1 < maxIndex:
+          inputOutput = inputOutput.Remove(currentIndex + 1, 1);
+          break;
+        case ConsoleKey.LeftArrow when currentIndex >= 0:
+        case ConsoleKey.RightArrow when currentIndex + 1 < maxIndex:
+          switch (key.Key)
+          {
+            case ConsoleKey.LeftArrow:
+              currentIndex--;
+              break;
+
+            case ConsoleKey.RightArrow:
+              currentIndex++;
+              break;
+          }
+
+          break;
+        default:
+        {
+          if ((char.IsLetterOrDigit(key.KeyChar) || char.IsPunctuation(key.KeyChar)) &&
+              (max is null || inputOutput.Length + 1 <= max) &&
+              (length < 0 || inputOutput.Length + 1 <= length))
+          {
+            inputOutput = inputOutput.Insert(currentIndex + 1, key.KeyChar.ToString());
+            currentIndex++;
+          }
+          else if (key.Key == ConsoleKey.Spacebar&&
+                   (max is null || inputOutput.Length + 1 <= max) &&
+                   (length < 0 || inputOutput.Length + 1 <= length))
+          {
+            inputOutput = inputOutput.Insert(currentIndex + 1, " ");
+            currentIndex++;
+          }
+
+          break;
+        }
       }
     }
 
