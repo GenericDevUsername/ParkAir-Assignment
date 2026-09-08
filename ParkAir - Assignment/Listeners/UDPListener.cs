@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ParkAir___Assignment.Listeners
 {
-    internal class UDPListener
-    {
-    }
+  internal class UDPListener
+  {
+  }
 }

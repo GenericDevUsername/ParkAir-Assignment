@@ -20,7 +20,7 @@ namespace ParkAir___Assignment
         Thread.Sleep(1);
       }
     }
-
+    
     private static SettingsTab InitSettings(string fp)
     {
       if (!File.Exists(fp))
@@ -132,6 +132,7 @@ namespace ParkAir___Assignment
           Console.WriteLine(ex.ToString());
         }
       }
+
       SettingsTab settingsTab = new(fp);
       return settingsTab;
     }

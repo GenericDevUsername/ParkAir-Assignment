@@ -1,8 +1,10 @@
-﻿namespace ParkAir___Assignment.Menus;
-
-public interface ITab
+﻿namespace ParkAir___Assignment.Menus
 {
-  public string TabName { get; set; }
-  public string Screen { get; set; }
-  internal void HandleKeypress(ConsoleKeyInfo key);
+  public interface ITab
+  {
+    public string TabName { get; set; }
+    public string ScreenString { get; }
+    internal void HandleKeypress(ConsoleKeyInfo key);
+    internal string Screen();
+  }
 }
