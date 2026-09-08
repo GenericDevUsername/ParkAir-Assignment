@@ -25,6 +25,7 @@ internal static class Program
     SettingsTab settingsConfig = InitSettings($"{dir}/settings.json");
     // add menus (tabs)
     menuHandler.AddTab(new SyslogTab(settingsConfig));
+    menuHandler.AddTab(new ExportTab());
     menuHandler.AddTab(settingsConfig);
 
     // start the menu background thread
