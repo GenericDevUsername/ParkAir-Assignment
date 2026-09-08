@@ -40,7 +40,7 @@ public class SyslogServer
 
   public List<SysMessage> GetLogs()
   {
-    return new List<SysMessage>(_log);
+    return new List<SysMessage>(this._log);
   }
 
   public void Start()
