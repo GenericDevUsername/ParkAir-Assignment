@@ -1,5 +1,7 @@
 ﻿using System.Runtime.InteropServices;
 
+namespace ParkAir___Assignment;
+
 public static class AnsiConsole
 {
     private const int STD_OUTPUT_HANDLE = -11;

@@ -1,7 +1,7 @@
-﻿namespace ParkAir___Assignment.Menus
+﻿namespace ParkAir___Assignment.Menus;
+
+public interface ITab
 {
-  public interface ITab
-  {
     public string TabName { get; set; }
     public string ScreenString { get; }
 
@@ -11,5 +11,4 @@
     internal string Screen();
 
     internal void Register(Gui gui);
-  }
 }

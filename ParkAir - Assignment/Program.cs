@@ -2,169 +2,165 @@
 using Newtonsoft.Json.Linq;
 using ParkAir___Assignment.Menus;
 
-namespace ParkAir___Assignment
+namespace ParkAir___Assignment;
+
+internal static class Program
 {
-  internal class Program
-  {
     private static void Main()
     {
-      Console.OutputEncoding = Encoding.UTF8;
-      AnsiConsole.Initialize();
+        Console.OutputEncoding = Encoding.UTF8;
+        AnsiConsole.Initialize();
 
-      Console.WriteLine("Initialising...");
-      var dir = Directory.GetCurrentDirectory();
+        Console.WriteLine("Initialising...");
+        var dir = Directory.GetCurrentDirectory();
 
-      Gui menuHandler = new();
-      menuHandler.AddTab(InitSettings($"{dir}/settings.json"));
-      menuHandler.AddTab(new SyslogTab());
-      
-      menuHandler.Start();
-      while (true)
-      {
-        Thread.Sleep(1);
-      }
+        Gui menuHandler = new();
+        menuHandler.AddTab(InitSettings($"{dir}/settings.json"));
+        menuHandler.AddTab(new SyslogTab());
+
+        menuHandler.Start();
+        while (true) Thread.Sleep(1);
     }
 
     private static SettingsTab InitSettings(string fp)
     {
-      if (!File.Exists(fp))
-      {
-        Console.WriteLine("Generating Settings File...");
-
-        JObject settingsTemplate = JObject.FromObject(new
+        if (!File.Exists(fp))
         {
-          FirstLaunch = true,
-          Network = new
-          {
-            ListeningType = new
+            Console.WriteLine("Generating Settings File...");
+
+            var settingsTemplate = JObject.FromObject(new
             {
-              Name = "Listening Type",
-              InputType = "SingleSelect",
-              OptionGap = 2,
-              Options = new List<string> { "TCP", "UDP", "BOTH" },
-              Selected = "BOTH",
-              Default = "BOTH",
-              RequiresRestart = true
-            },
-            IpType = new
+                FirstLaunch = true,
+                Network = new
+                {
+                    ListeningType = new
+                    {
+                        Name = "Listening Type",
+                        InputType = "SingleSelect",
+                        OptionGap = 2,
+                        Options = new List<string> { "TCP", "UDP", "BOTH" },
+                        Selected = "BOTH",
+                        Default = "BOTH",
+                        RequiresRestart = true
+                    },
+                    IpType = new
+                    {
+                        Name = "Ip Type",
+                        InputType = "SingleSelect",
+                        OptionGap = 1,
+                        Options = new List<string> { "IPV4", "IPV6", "BOTH" },
+                        Selected = "BOTH",
+                        Default = "BOTH",
+                        RequiresRestart = true
+                    },
+                    ListeningIp = new
+                    {
+                        Name = "Listening IP",
+                        InputType = "IP",
+                        Selected = "LocalHost",
+                        Default = "LocalHost",
+                        RequiresRestart = true
+                    },
+                    ListeningPort = new
+                    {
+                        Name = "Listening Port",
+                        InputType = "Port",
+                        Selected = "514",
+                        Default = "514",
+                        RequiresRestart = true
+                    }
+                },
+                Colors = new
+                {
+                    Emergency = new
+                    {
+                        Name = "Emergency",
+                        InputType = "Color",
+                        Selected = "DARK_BLUE",
+                        Default = "DARK_BLUE",
+                        RequiresRestart = false
+                    },
+                    Alert = new
+                    {
+                        Name = "Alert",
+                        InputType = "Color",
+                        Selected = "DARK_BLUE",
+                        Default = "DARK_BLUE",
+                        RequiresRestart = false
+                    },
+                    Critical = new
+                    {
+                        Name = "Critical",
+                        InputType = "Color",
+                        Selected = "DARK_BLUE",
+                        Default = "DARK_BLUE",
+                        RequiresRestart = false
+                    },
+                    Error = new
+                    {
+                        Name = "Color",
+                        InputType = "Color",
+                        Selected = "DARK_RED",
+                        Default = "DARK_RED",
+                        RequiresRestart = false
+                    },
+                    Warning = new
+                    {
+                        Name = "Warning",
+                        InputType = "Color",
+                        Selected = "DARK_YELLOW",
+                        Default = "DARK_YELLOW",
+                        RequiresRestart = false
+                    },
+                    Notice = new
+                    {
+                        Name = "Notice",
+                        InputType = "Color",
+                        Selected = "DARK_YELLOW",
+                        Default = "DARK_YELLOW",
+                        RequiresRestart = false
+                    },
+                    Informational = new
+                    {
+                        Name = "Informational",
+                        InputType = "Color",
+                        Selected = "BLACK",
+                        Default = "BLACK",
+                        RequiresRestart = false
+                    },
+                    Debug = new
+                    {
+                        Name = "Debug",
+                        InputType = "Color",
+                        Selected = "DARK_BLUE",
+                        Default = "DARK_BLUE",
+                        RequiresRestart = false
+                    }
+                }
+            });
+
+            //Console.WriteLine(settingsTemplate.ToString());
+
+            try
             {
-              Name = "Ip Type",
-              InputType = "SingleSelect",
-              OptionGap = 1,
-              Options = new List<string> { "IPV4", "IPV6", "BOTH" },
-              Selected = "BOTH",
-              Default = "BOTH",
-              RequiresRestart = true
-            },
-            ListeningIp = new
-            {
-              Name = "Listening IP",
-              InputType = "IP",
-              Selected = "LocalHost",
-              Default = "LocalHost",
-              RequiresRestart = true
-            },
-            ListeningPort = new
-            {
-              Name = "Listening Port",
-              InputType = "Port",
-              Selected = "514",
-              Default = "514",
-              RequiresRestart = true
+                // Create the file, or overwrite if the file exists.
+                using (var fs = File.Create(fp))
+                {
+                    var info = new UTF8Encoding(true).GetBytes(settingsTemplate.ToString());
+                    // Add some information to the file.
+                    fs.Write(info, 0, info.Length);
+                }
+
+                Console.WriteLine("Generated Settings File...");
             }
-          },
-          Colors = new
-          {
-            Emergency = new
+
+            catch (Exception ex)
             {
-              Name = "Emergency",
-              InputType = "Color",
-              Selected = "DARK_BLUE",
-              Default = "DARK_BLUE",
-              RequiresRestart = false
-            },
-            Alert = new
-            {
-              Name = "Alert",
-              InputType = "Color",
-              Selected = "DARK_BLUE",
-              Default = "DARK_BLUE",
-              RequiresRestart = false
-            },
-            Critical = new
-            {
-              Name = "Critical",
-              InputType = "Color",
-              Selected = "DARK_BLUE",
-              Default = "DARK_BLUE",
-              RequiresRestart = false
-            },
-            Error = new
-            {
-              Name = "Color",
-              InputType = "Color",
-              Selected = "DARK_RED",
-              Default = "DARK_RED",
-              RequiresRestart = false
-            },
-            Warning = new
-            {
-              Name = "Warning",
-              InputType = "Color",
-              Selected = "DARK_YELLOW",
-              Default = "DARK_YELLOW",
-              RequiresRestart = false
-            },
-            Notice = new
-            {
-              Name = "Notice",
-              InputType = "Color",
-              Selected = "DARK_YELLOW",
-              Default = "DARK_YELLOW",
-              RequiresRestart = false
-            },
-            Informational = new
-            {
-              Name = "Informational",
-              InputType = "Color",
-              Selected = "BLACK",
-              Default = "BLACK",
-              RequiresRestart = false
-            },
-            Debug = new
-            {
-              Name = "Debug",
-              InputType = "Color",
-              Selected = "DARK_BLUE",
-              Default = "DARK_BLUE",
-              RequiresRestart = false
+                Console.WriteLine(ex.ToString());
             }
-          }
-        });
-
-        //Console.WriteLine(settingsTemplate.ToString());
-
-        try
-        {
-          // Create the file, or overwrite if the file exists.
-          using (FileStream fs = File.Create(fp))
-          {
-            var info = new UTF8Encoding(true).GetBytes(settingsTemplate.ToString());
-            // Add some information to the file.
-            fs.Write(info, 0, info.Length);
-          }
-
-          Console.WriteLine("Generated Settings File...");
         }
 
-        catch (Exception ex)
-        {
-          Console.WriteLine(ex.ToString());
-        }
-      }
-
-      SettingsTab settingsTab = new(fp);
-      return settingsTab;
+        SettingsTab settingsTab = new(fp);
+        return settingsTab;
     }
-  }
 }
