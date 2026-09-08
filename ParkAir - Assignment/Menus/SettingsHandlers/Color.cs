@@ -54,7 +54,7 @@
     public string? FromSetting(string value)
     {
       string? response = null;
-      if (_colors.TryGetValue(value, out string? color)) response = color;
+      if (this._colors.TryGetValue(value, out string? color)) response = color;
       return response;
     }
   }
