@@ -12,7 +12,7 @@ internal static class Program
         AnsiConsole.Initialize();
 
         Console.WriteLine("Initialising...");
-        var dir = Directory.GetCurrentDirectory();
+        string dir = Directory.GetCurrentDirectory();
 
         Gui menuHandler = new();
         SettingsTab settingsConfig = InitSettings($"{dir}/settings.json");
@@ -28,7 +28,7 @@ internal static class Program
         {
             Console.WriteLine("Generating Settings File...");
 
-            var settingsTemplate = JObject.FromObject(new
+            JObject settingsTemplate = JObject.FromObject(new
             {
                 FirstLaunch = true,
                 Network = new
@@ -144,9 +144,9 @@ internal static class Program
             try
             {
                 // Create the file, or overwrite if the file exists.
-                using (var fs = File.Create(fp))
+                using (FileStream fs = File.Create(fp))
                 {
-                    var info = new UTF8Encoding(true).GetBytes(settingsTemplate.ToString());
+                    byte[] info = new UTF8Encoding(true).GetBytes(settingsTemplate.ToString());
                     // Add some information to the file.
                     fs.Write(info, 0, info.Length);
                 }

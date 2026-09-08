@@ -32,29 +32,29 @@ public class Gui
         int? min = null, int? max = null, int length = -1, Regex? regexCheck = null, string customError = "")
     {
         // Assign dynamic location defaults based on current cursor position
-        var currentCursorVisibility = Console.CursorVisible;
+        bool currentCursorVisibility = Console.CursorVisible;
         if (top == -1 || left == -1) (left, top) = Console.GetCursorPosition();
         if (length == -1) length = Console.WindowWidth - (left >= 0 ? left : 0);
 
         // Pre define variables based on above information (if a prefill is provided we must start the function at a point where it appears this input has already been typed in
-        var inputOutput = prefill == "" ? "" : prefill;
-        var currentIndex = prefill == "" ? 0 : prefill.Length - 1;
+        string inputOutput = prefill == "" ? "" : prefill;
+        int currentIndex = prefill == "" ? 0 : prefill.Length - 1;
 
         // Check if the prefill already surpasses the provided max char count, If it does throw an error
         if (max is not null && max < prefill.Length)
         {
-            var error = new Exception("Max is smaller than provided prefill");
-            throw error;
+            Exception error = new Exception("Max is smaller than provided prefill");
+            throw error;        
         }
 
         // Position cursor at provided location
-        var intercept = true;
-        var cancel = false;
-        var errorMsg = "";
+        bool intercept = true;
+        bool cancel = false;
+        string errorMsg = "";
         while (intercept)
         {
             // update indexes
-            var maxIndex = inputOutput.Length;
+            int maxIndex = inputOutput.Length;
 
             Console.CursorVisible = false;
             Console.SetCursorPosition(left, top);
@@ -72,7 +72,7 @@ public class Gui
                 continue;
             }
 
-            var key = Console.ReadKey(true);
+            ConsoleKeyInfo key = Console.ReadKey(true);
             if (key.Key == ConsoleKey.Escape)
             {
                 intercept = false;
@@ -133,16 +133,16 @@ public class Gui
 
     private string GenerateTabs(Gui gui)
     {
-        var tabTop = "";
-        var tabMiddle = "";
-        var tabBottom = "";
+        string tabTop = "";
+        string tabMiddle = "";
+        string tabBottom = "";
 
         if (gui.Tabs.Count > 1)
         {
             tabTop += "┌";
             tabMiddle += "│";
             tabBottom += "├";
-            foreach (var tab in Tabs)
+            foreach (ITab tab in Tabs)
             {
                 tabTop += $"{new string('─', tab.TabName.Length + 4)}{(tab == Tabs[^1] ? "┐" : "┬")}";
                 tabMiddle +=
@@ -151,9 +151,9 @@ public class Gui
                 if (tab == Tabs[Tabs.Count - 1 < 0 ? 0 : Tabs.Count - 1] &&
                     tabBottom.Length - (Tabs[_tabIndex].Tabber ? 0 : 9) < 92)
                 {
-                    var lineCount = 92 - tabBottom.Length < 0 ? 0 : 92 - tabBottom.Length;
+                    int lineCount = 92 - tabBottom.Length < 0 ? 0 : 92 - tabBottom.Length;
                     tabBottom = $"{tabBottom.Remove(tabBottom.Length - 1, 1)}{new string('─', lineCount)}┐";
-                    var lineThreeArray = tabBottom.ToCharArray();
+                    char[] lineThreeArray = tabBottom.ToCharArray();
                     lineThreeArray[tabMiddle.Length - (Tabs[_tabIndex].Tabber ? 0 : 18) - 1] = '┴';
                     tabBottom = new string(lineThreeArray);
                 }
@@ -166,8 +166,8 @@ public class Gui
                          tabBottom.Length - (Tabs[_tabIndex].Tabber ? 0 : 9) > 92)
                 {
                     tabBottom = $"{tabBottom.Remove(tabBottom.Length - 1, 1)}┘";
-                    var lineThreeArray = tabBottom.ToCharArray();
-                    var lineTwoArray = tabMiddle.ToCharArray();
+                    char[] lineThreeArray = tabBottom.ToCharArray();
+                    char[] lineTwoArray = tabMiddle.ToCharArray();
                     lineThreeArray[91] = lineTwoArray[Tabs[_tabIndex].Tabber ? 91 : 96] == '│' ? '┼' : '┬';
                     tabBottom = new string(lineThreeArray);
                 }
@@ -185,14 +185,14 @@ public class Gui
 
     private void ScreenUpdate()
     {
-        var tabs = GenerateTabs(this);
-        var screen = $"{tabs}\n{Tabs[_tabIndex].Screen()}";
-        var screenLines = screen.Split("\n").ToList();
+        string tabs = GenerateTabs(this);
+        string screen = $"{tabs}\n{Tabs[_tabIndex].Screen()}";
+        List<string> screenLines = screen.Split("\n").ToList();
         screenLines.AddRange(_debug);
-        for (var i = 0; i < screenLines.Count; i++)
+        for (int i = 0; i < screenLines.Count; i++)
             screenLines[i] = $"{screenLines[i]}{new string(' ', Console.BufferWidth - screenLines[i].Length)}";
 
-        for (var i = 0; i < Console.WindowHeight - screenLines.Count; i++)
+        for (int i = 0; i < Console.WindowHeight - screenLines.Count; i++)
             screenLines.Add($"{new string(' ', Console.BufferWidth)}");
 
         Console.SetCursorPosition(0, 0);
@@ -201,23 +201,19 @@ public class Gui
 
     private void InputHandler()
     {
-        var key = Console.ReadKey(true);
+        ConsoleKeyInfo key = Console.ReadKey(true);
         HandleKeypress(key);
     }
 
     private void HandleKeypress(ConsoleKeyInfo key)
     {
         if (Tabs[_tabIndex].Tabber)
-            switch (key.Key)
+            _tabIndex = key.Key switch
             {
-                case ConsoleKey.LeftArrow:
-                    _tabIndex = _tabIndex - 1 == -1 ? _tabIndex : _tabIndex - 1;
-                    break;
-
-                case ConsoleKey.RightArrow:
-                    _tabIndex = _tabIndex + 1 == Tabs.Count ? _tabIndex : _tabIndex + 1;
-                    break;
-            }
+                ConsoleKey.LeftArrow => _tabIndex - 1 == -1 ? _tabIndex : _tabIndex - 1,
+                ConsoleKey.RightArrow => _tabIndex + 1 == Tabs.Count ? _tabIndex : _tabIndex + 1,
+                _ => _tabIndex
+            };
 
         Console.CursorVisible = CURSOR;
         if (Tabs.Count > 0) Tabs[_tabIndex].HandleKeypress(key);
@@ -225,7 +221,7 @@ public class Gui
         // DEBUG STRING UPDATER - REMOVE LATER
         if (_debug[0] == key.Key.ToString())
         {
-            var temp = Convert.ToInt32(_debug[1].Replace(" ", "").Remove(0, 1));
+            int temp = Convert.ToInt32(_debug[1].Replace(" ", "").Remove(0, 1));
             temp++;
             _debug[1] = $"x{temp}          ";
         }

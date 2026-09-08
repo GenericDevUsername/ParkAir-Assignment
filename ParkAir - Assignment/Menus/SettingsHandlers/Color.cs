@@ -37,16 +37,16 @@ public class Color
 
     public string Next(string current)
     {
-        var response = "Default";
-        var currentIndex = _order.IndexOf(current);
+        string response = "Default";
+        int currentIndex = _order.IndexOf(current);
         if (currentIndex > -1) response = _order[Mod(currentIndex + 1, _order.Count)];
         return response;
     }
 
     public string Previous(string current)
     {
-        var response = "Default";
-        var currentIndex = _order.IndexOf(current);
+        string response = "Default";
+        int currentIndex = _order.IndexOf(current);
         if (currentIndex > -1) response = _order[Mod(currentIndex - 1, _order.Count)];
         return response;
     }
@@ -54,7 +54,7 @@ public class Color
     public string? FromSetting(string value)
     {
         string? response = null;
-        if (_colors.TryGetValue(value, out var color)) response = color;
+        if (_colors.TryGetValue(value, out string? color)) response = color;
         return response;
     }
 }

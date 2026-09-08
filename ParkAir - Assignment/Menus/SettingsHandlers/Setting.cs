@@ -26,8 +26,8 @@ public class Setting
 
     private void Value_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        var file = File.CreateText(Category.FilePath);
-        var writer = new JsonTextWriter(file);
+        StreamWriter file = File.CreateText(Category.FilePath);
+        JsonTextWriter writer = new(file);
         writer.Formatting = Formatting.Indented;
         Category.Tab.Settings.WriteToAsync(writer);
         file.Close();

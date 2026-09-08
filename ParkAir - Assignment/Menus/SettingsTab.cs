@@ -16,7 +16,7 @@ public class SettingsTab : ITab
     public SettingsTab(string fp)
     {
         SettingsFile = fp;
-        var file = File.OpenText(fp);
+        StreamReader file = File.OpenText(fp);
         JsonTextReader reader = new(file);
         Settings = (JObject)JToken.ReadFrom(reader);
         file.Close();
@@ -84,11 +84,11 @@ public class SettingsTab : ITab
     public string Screen()
     {
         List<string> screenLines = new();
-        var line = _gui is { Tabs.Count: > 1 } ? 3 : 1;
-        foreach (var category in _settings)
+        int line = _gui is { Tabs.Count: > 1 } ? 3 : 1;
+        foreach (SettingsCategory category in _settings)
         {
             screenLines.Add($"│{category.Name}:{new string(' ', 89 - category.Name.Length)}│");
-            foreach (var setting in category.Settings)
+            foreach (Setting setting in category.Settings)
             {
                 line++;
                 screenLines.Add(SettingString(setting));
@@ -113,7 +113,7 @@ public class SettingsTab : ITab
 
     private void BuildSettings()
     {
-        foreach (var category in Settings)
+        foreach (KeyValuePair<string, JToken?> category in Settings)
         {
             if (category.Value is null) continue;
             if (category.Key == "FirstLaunch" || category.Value.Type != JTokenType.Object) continue;
@@ -124,7 +124,7 @@ public class SettingsTab : ITab
     private void BuildCategory(string name, JToken settings)
     {
         SettingsCategory builtCategory = new(name, this);
-        foreach (var setting in settings.Value<JObject>()!)
+        foreach (KeyValuePair<string, JToken?> setting in settings.Value<JObject>()!)
         {
             Setting settingClass = new(builtCategory, setting, _selectionIndex.Count);
             builtCategory.Settings.Add(settingClass);
@@ -177,18 +177,18 @@ public class SettingsTab : ITab
 
     private void ResetToDefaults()
     {
-        foreach (var setting in _selectionIndex) setting.Reset();
+        foreach (Setting setting in _selectionIndex) setting.Reset();
     }
 
     private string SettingString(Setting setting)
     {
-        var valueDisplay = "";
-        var offset = 0;
-        var settingType = (string)setting.Value["InputType"];
+        string valueDisplay = "";
+        int offset = 0;
+        string settingType = (string)setting.Value["InputType"];
         switch (settingType)
         {
             case "SingleSelect":
-                var options = (JArray)setting.Value["Options"];
+                JArray options = (JArray)setting.Value["Options"];
                 valueDisplay = "";
                 foreach (string option in options)
                     valueDisplay +=

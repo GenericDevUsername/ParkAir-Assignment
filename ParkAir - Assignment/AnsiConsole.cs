@@ -23,10 +23,10 @@ public static class AnsiConsole
 
     private static void EnableAnsiEscapeSequencesOnWindows()
     {
-        var handle = GetStdHandle(STD_OUTPUT_HANDLE);
+        IntPtr handle = GetStdHandle(STD_OUTPUT_HANDLE);
         if (handle == IntPtr.Zero) throw new Exception("Cannot get standard output handle");
 
-        if (!GetConsoleMode(handle, out var mode)) throw new Exception("Cannot get console mode");
+        if (!GetConsoleMode(handle, out uint mode)) throw new Exception("Cannot get console mode");
 
         mode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
         if (!SetConsoleMode(handle, mode)) throw new Exception("Cannot set console mode");
