@@ -7,14 +7,19 @@ namespace ParkAir___Assignment.Menus.SettingsHandlers
   public class Setting
   {
     public string Key { get; }
+    public string Name { get; }
+    public int SelectionIndex { get; }
     public SettingsCategory Category { get; }
-    public string Value { get; }
+    public JObject? Value { get; }
 
-    public Setting(SettingsCategory category, KeyValuePair<string, JToken?> setting)
+    public Setting(SettingsCategory category, KeyValuePair<string, JToken?> setting, int selectionIndex)
     {
-      this.Category = category;
-      this.Key = setting.Key;
-      
+      Category = category;
+      Key = setting.Key;
+      SelectionIndex = selectionIndex;
+      Value = setting.Value.Value<JObject>();
+      Name = (string)Value["Name"];
+
     }
   }
 }

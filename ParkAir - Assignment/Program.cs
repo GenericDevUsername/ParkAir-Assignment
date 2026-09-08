@@ -8,10 +8,16 @@ namespace ParkAir___Assignment
   {
     private static void Main()
     {
+      Console.OutputEncoding = Encoding.UTF8;
+
       Console.WriteLine("Initialising...");
       var dir = Directory.GetCurrentDirectory();
 
       Gui menuHandler = new();
+      menuHandler.AddTab(InitSettings($"{dir}/settings.json"));
+      menuHandler.AddTab(InitSettings($"{dir}/settings.json"));
+      menuHandler.AddTab(InitSettings($"{dir}/settings.json"));
+      menuHandler.AddTab(InitSettings($"{dir}/settings.json"));
       menuHandler.AddTab(InitSettings($"{dir}/settings.json"));
 
       menuHandler.Start();
@@ -20,7 +26,7 @@ namespace ParkAir___Assignment
         Thread.Sleep(1);
       }
     }
-    
+
     private static SettingsTab InitSettings(string fp)
     {
       if (!File.Exists(fp))
@@ -34,26 +40,32 @@ namespace ParkAir___Assignment
           {
             ListeningType = new
             {
+              Name = "Listening Type",
               InputType = "SingleSelect",
+              OptionGap = 2,
               Options = new List<string> { "TCP", "UDP", "BOTH" },
               Selected = "BOTH",
               Default = "BOTH"
             },
             IpType = new
             {
+              Name = "Ip Type",
               InputType = "SingleSelect",
+              OptionGap = 1,
               Options = new List<string> { "IPV4", "IPV6", "BOTH" },
               Selected = "BOTH",
               Default = "BOTH"
             },
             ListeningIp = new
             {
+              Name = "Listening IP",
               InputType = "IP",
               Selected = "LocalHost",
               Default = "LocalHost"
             },
             ListeningPort = new
             {
+              Name = "Listening Port",
               InputType = "Port",
               Selected = "514",
               Default = "514"
@@ -63,51 +75,59 @@ namespace ParkAir___Assignment
           {
             Emergency = new
             {
+              Name = "Emergency",
               InputType = "Color",
-              Selected = "DarkBlue",
-              Default = "DarkBlue"
+              Selected = "DARK_BLUE",
+              Default = "DARK_BLUE"
             },
             Alert = new
             {
+              Name = "Alert",
               InputType = "Color",
-              Selected = "DarkBlue",
-              Default = "DarkBlue"
+              Selected = "DARK_BLUE",
+              Default = "DARK_BLUE"
             },
             Critical = new
             {
+              Name = "Critical",
               InputType = "Color",
-              Selected = "DarkBlue",
-              Default = "DarkBlue"
+              Selected = "DARK_BLUE",
+              Default = "DARK_BLUE"
             },
             Error = new
             {
+              Name = "Color",
               InputType = "Color",
-              Selected = "Red",
-              Default = "Red"
+              Selected = "DARK_RED",
+              Default = "DARK_RED"
             },
             Warning = new
             {
+              Name = "Warning",
               InputType = "Color",
-              Selected = "Yellow",
-              Default = "Yellow"
+              Selected = "DARK_YELLOW",
+              Default = "DARK_YELLOW"
             },
             Notice = new
             {
+              Name = "Notice",
               InputType = "Color",
-              Selected = "Yellow",
-              Default = "Yellow"
+              Selected = "DARK_YELLOW",
+              Default = "DARK_YELLOW"
             },
             Informational = new
             {
+              Name = "Informational",
               InputType = "Color",
-              Selected = "Black",
-              Default = "Black"
+              Selected = "BLACK",
+              Default = "BLACK"
             },
             Debug = new
             {
+              Name = "Debug",
               InputType = "Color",
-              Selected = "DarkBlue",
-              Default = "DarkBlue"
+              Selected = "DARK_BLUE",
+              Default = "DARK_BLUE"
             }
           }
         });
