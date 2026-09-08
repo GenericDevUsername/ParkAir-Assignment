@@ -5,20 +5,19 @@ namespace ParkAir___Assignment.Menus
 {
   internal class SettingsTab : ITab
   {
-    public string TabName = "Settings";
+    public string TabName { get; set; } = "Settings"; 
+    public string Screen { get; set; } = "Settings"; 
     public readonly JObject Settings;
 
     public SettingsTab(string fp)
     {
       StreamReader file = File.OpenText(fp);
       JsonTextReader reader = new JsonTextReader(file);
-      JObject o2 = (JObject)JToken.ReadFrom(reader);
-      
-      Console.WriteLine(o2.ToString());
+      this.Settings = (JObject)JToken.ReadFrom(reader);
     }
     public void HandleKeypress(ConsoleKeyInfo key)
     {
-      Console.WriteLine("SettingsPotato");
+
     }
   }
 }
