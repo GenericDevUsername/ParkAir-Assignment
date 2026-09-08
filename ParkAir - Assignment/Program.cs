@@ -8,27 +8,35 @@ internal static class Program
 {
   private static void Main()
   {
+    Console.WriteLine("Initialising...");
+    
+    ///// INITIALIZE CONSOLE FOR UTF-8 & ANSI SUPPORT /////
     Console.OutputEncoding = Encoding.UTF8;
     AnsiConsole.Initialize();
-
-    Console.WriteLine("Initialising...");
+    
+    // get current working directory
     string dir = Directory.GetCurrentDirectory();
 
+    ///// SETUP UI CLASS /////
     Gui menuHandler = new("Park Air Syslog");
     SettingsTab settingsConfig = InitSettings($"{dir}/settings.json");
+    // add menus (tabs)
     menuHandler.AddTab(settingsConfig);
     menuHandler.AddTab(new SyslogTab(settingsConfig));
-
+    
+    // start the menu background thread
     menuHandler.Start();
-    Console.Title = "Menu not blocking";
   }
 
   private static SettingsTab InitSettings(string fp)
   {
-    if (!File.Exists(fp))
+    ///// SETUP SETTINGS MENU REQUIREMENTS /////
+    
+    if (!File.Exists(fp)) // if the settings file doesn't exist create it with default values
     {
       Console.WriteLine("Generating Settings File...");
-
+      
+      // settings json
       JObject settingsTemplate = JObject.FromObject(new
       {
         FirstLaunch = true,
@@ -140,15 +148,13 @@ internal static class Program
         }
       });
 
-      //Console.WriteLine(settingsTemplate.ToString());
-
       try
       {
         // Create the file, or overwrite if the file exists.
         using (FileStream fs = File.Create(fp))
         {
+          // Convert the file to byes and save to the settings file
           byte[] info = new UTF8Encoding(true).GetBytes(settingsTemplate.ToString());
-          // Add some information to the file.
           fs.Write(info, 0, info.Length);
         }
 
@@ -161,6 +167,7 @@ internal static class Program
       }
     }
 
+    // create a settings tab with the settings file and return it
     SettingsTab settingsTab = new(fp);
     return settingsTab;
   }
