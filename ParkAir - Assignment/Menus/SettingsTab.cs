@@ -14,6 +14,7 @@ namespace ParkAir___Assignment.Menus
 
     public string SettingsFile = "";
     public bool Tabber { get; private set; } = true;
+    private int _resetter = 0;
     private List<SettingsCategory> _settings = new();
     private List<Setting> _selectionIndex = new();
     public Gui? _gui { get; private set; }
@@ -28,7 +29,6 @@ namespace ParkAir___Assignment.Menus
       Settings = (JObject)JToken.ReadFrom(reader);
       file.Close();
       BuildSettings();
-
     }
 
     public void Register(Gui gui)
@@ -112,10 +112,14 @@ namespace ParkAir___Assignment.Menus
 
     public void HandleKeypress(ConsoleKeyInfo key)
     {
+      if (CurrentIndex < _selectionIndex.Count && this._resetter > 0)
+      {
+        this._resetter = 0;
+      }
       switch (key.Key)
       {
         case ConsoleKey.DownArrow:
-          CurrentIndex = CurrentIndex + 1 == this._selectionIndex.Count ? CurrentIndex : CurrentIndex + 1;
+          CurrentIndex = CurrentIndex + 1 == this._selectionIndex.Count + 1 ? CurrentIndex : CurrentIndex + 1;
           break;
 
         case ConsoleKey.UpArrow:
@@ -123,31 +127,36 @@ namespace ParkAir___Assignment.Menus
           break;
 
         case ConsoleKey.Enter:
-          if (CurrentIndex >= 0)
+          if (CurrentIndex >= 0 && CurrentIndex < _selectionIndex.Count)
           { 
             ChangeSetting(_selectionIndex[CurrentIndex], key);
+          }
+          if (CurrentIndex >= _selectionIndex.Count && this._resetter > 0)
+          {
+            _resetter++;
+            if (_resetter == 3)
+            {
+              ResetToDefaults();
+              _resetter = 0;
+            }
+          }
+          else if (CurrentIndex >= _selectionIndex.Count)
+          {
+            this._resetter++;
           }
           break;
 
         case ConsoleKey.RightArrow:
-          if (CurrentIndex >= 0)
+          if (CurrentIndex >= 0 && CurrentIndex <= _selectionIndex.Count)
           {
             ChangeSetting(_selectionIndex[CurrentIndex], key);
           }
           break;
 
         case ConsoleKey.LeftArrow:
-          if (CurrentIndex >= 0)
+          if (CurrentIndex >= 0 && CurrentIndex <= _selectionIndex.Count)
           {
             ChangeSetting(_selectionIndex[CurrentIndex], key);
-          }
-          break;
-
-        // TESTING RESET TO DEFAULTS (ADD TO BOTTOM)
-        case ConsoleKey.Delete:
-          if (CurrentIndex >= 0)
-          {
-            ResetToDefaults();
           }
           break;
 
@@ -195,7 +204,7 @@ namespace ParkAir___Assignment.Menus
       }
 
       return
-        $"│[{(CurrentIndex >= 0 ? this._selectionIndex[CurrentIndex < 0 ? 0 : CurrentIndex] == setting ? ">" : " " : " ")}] {setting.Name}{new(' ', 85 - setting.Name.Length - valueDisplay.Length + offset)}{valueDisplay} │";
+        $"│[{(CurrentIndex >= 0 ? (CurrentIndex < 0 || CurrentIndex > _selectionIndex.Count ? 0 : CurrentIndex) >= 0 && (CurrentIndex < 0 || CurrentIndex > _selectionIndex.Count ? 0 : CurrentIndex) < this._selectionIndex.Count && this._selectionIndex[CurrentIndex < 0 || CurrentIndex > _selectionIndex.Count ? 0 : CurrentIndex] == setting ? ">" : " " : " ")}] {setting.Name}{new(' ', 85 - setting.Name.Length - valueDisplay.Length + offset)}{valueDisplay} │";
     }
 
     public string Screen()
@@ -212,11 +221,10 @@ namespace ParkAir___Assignment.Menus
           setting.Line = line;
         }
 
-        if (this._settings[this._settings.Count - 1 < 0 ? 0 : this._settings.Count - 1] != category)
-        {
-          screenLines.Add($"│{new string(' ', 90)}│");
-        }
+        screenLines.Add($"│{new string(' ', 90)}│");
       }
+
+      screenLines.Add($"│[{(CurrentIndex == _selectionIndex.Count ? ">" : " ")}] Reset to Defaults {(CurrentIndex == _selectionIndex.Count ? (this._resetter > 0 ? $"\x1b[31m(Press Enter {3 - this._resetter} More Time(s) to Confirm)\x1b[0m" : "(Press Enter)") : " ")}{new(' ', 85 - 18 - (CurrentIndex == _selectionIndex.Count ? (this._resetter > 0 ? 38 : 12) : 0))}│");
 
       screenLines.Add($"└{new string('─', 90)}┘");
 

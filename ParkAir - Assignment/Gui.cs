@@ -75,7 +75,7 @@ namespace ParkAir___Assignment
           continue;
         }
         ConsoleKeyInfo key = Console.ReadKey(true);
-        if (key.Key == ConsoleKey.Backspace)
+        if (key.Key == ConsoleKey.Escape)
         {
           intercept = false;
           cancel = true;
@@ -189,11 +189,22 @@ namespace ParkAir___Assignment
 
     private void ScreenUpdate()
     {
-      var tabs = GenerateTabs(this);
-      var screen = $"{tabs}\n{this.Tabs[this._tabIndex].Screen()}";
+      string tabs = GenerateTabs(this);
+      string screen = $"{tabs}\n{this.Tabs[this._tabIndex].Screen()}";
+      List<string> screenLines = screen.Split("\n").ToList();
+      screenLines.AddRange(this._debug);
+      for (int i = 0; i < screenLines.Count; i++)
+      {
+        screenLines[i] = $"{screenLines[i]}{new string(' ', Console.BufferWidth - screenLines[i].Length)}";
+      }
+
+      for (int i = 0; i < Console.WindowHeight - screenLines.Count; i++)
+      {
+        screenLines.Add($"{new string(' ', Console.BufferWidth)}");
+      }
 
       Console.SetCursorPosition(0, 0);
-      Console.WriteLine(screen + $"\n{string.Join('\n', this._debug.ToArray())}");
+      Console.WriteLine($"{string.Join('\n', screenLines)}");
     }
 
     private void InputHandler()

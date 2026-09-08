@@ -16,6 +16,7 @@ namespace ParkAir___Assignment
 
       Gui menuHandler = new();
       menuHandler.AddTab(InitSettings($"{dir}/settings.json"));
+      menuHandler.AddTab(new SyslogTab());
       
       menuHandler.Start();
       while (true)
@@ -42,7 +43,8 @@ namespace ParkAir___Assignment
               OptionGap = 2,
               Options = new List<string> { "TCP", "UDP", "BOTH" },
               Selected = "BOTH",
-              Default = "BOTH"
+              Default = "BOTH",
+              RequiresRestart = true
             },
             IpType = new
             {
@@ -51,21 +53,24 @@ namespace ParkAir___Assignment
               OptionGap = 1,
               Options = new List<string> { "IPV4", "IPV6", "BOTH" },
               Selected = "BOTH",
-              Default = "BOTH"
+              Default = "BOTH",
+              RequiresRestart = true
             },
             ListeningIp = new
             {
               Name = "Listening IP",
               InputType = "IP",
               Selected = "LocalHost",
-              Default = "LocalHost"
+              Default = "LocalHost",
+              RequiresRestart = true
             },
             ListeningPort = new
             {
               Name = "Listening Port",
               InputType = "Port",
               Selected = "514",
-              Default = "514"
+              Default = "514",
+              RequiresRestart = true
             }
           },
           Colors = new
@@ -75,56 +80,64 @@ namespace ParkAir___Assignment
               Name = "Emergency",
               InputType = "Color",
               Selected = "DARK_BLUE",
-              Default = "DARK_BLUE"
+              Default = "DARK_BLUE",
+              RequiresRestart = false
             },
             Alert = new
             {
               Name = "Alert",
               InputType = "Color",
               Selected = "DARK_BLUE",
-              Default = "DARK_BLUE"
+              Default = "DARK_BLUE",
+              RequiresRestart = false
             },
             Critical = new
             {
               Name = "Critical",
               InputType = "Color",
               Selected = "DARK_BLUE",
-              Default = "DARK_BLUE"
+              Default = "DARK_BLUE",
+              RequiresRestart = false
             },
             Error = new
             {
               Name = "Color",
               InputType = "Color",
               Selected = "DARK_RED",
-              Default = "DARK_RED"
+              Default = "DARK_RED",
+              RequiresRestart = false
             },
             Warning = new
             {
               Name = "Warning",
               InputType = "Color",
               Selected = "DARK_YELLOW",
-              Default = "DARK_YELLOW"
+              Default = "DARK_YELLOW",
+              RequiresRestart = false
             },
             Notice = new
             {
               Name = "Notice",
               InputType = "Color",
               Selected = "DARK_YELLOW",
-              Default = "DARK_YELLOW"
+              Default = "DARK_YELLOW",
+              RequiresRestart = false
             },
             Informational = new
             {
               Name = "Informational",
               InputType = "Color",
               Selected = "BLACK",
-              Default = "BLACK"
+              Default = "BLACK",
+              RequiresRestart = false
             },
             Debug = new
             {
               Name = "Debug",
               InputType = "Color",
               Selected = "DARK_BLUE",
-              Default = "DARK_BLUE"
+              Default = "DARK_BLUE",
+              RequiresRestart = false
             }
           }
         });
