@@ -69,7 +69,9 @@ public class SyslogTab : ITab
 
   private void DeleteLocalStore()
   {
-
+    this._sysServer._queue.Clear();
+    this._sysServer._clearLogs = true;
+    this._sysServer._log = new SlidingBuffer<SysMessage>(250);
   }
 
   private void ChangeFilter(int index, ConsoleKey action)
@@ -202,8 +204,15 @@ public class SyslogTab : ITab
   {
     while (true)
     {
-      if (_gui != null && (_gui._tabIndex < 0 || _gui._tabIndex >= _gui?.Tabs.Count)) _gui._tabIndex = -1;
-      if (_gui?.Tabs[_gui._tabIndex] == this && !_pause) _gui?.ScreenUpdate();
+      try
+      {
+        if (_gui != null && (_gui._tabIndex < 0 || _gui._tabIndex >= _gui?.Tabs.Count)) _gui._tabIndex = -1;
+        if (_gui?.Tabs[_gui._tabIndex] == this && !_pause) _gui?.ScreenUpdate();
+      }
+      catch
+      {
+        // ignore
+      }
       Thread.Sleep((int)3E3);
     }
   }

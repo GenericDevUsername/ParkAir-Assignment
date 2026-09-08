@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace ParkAir___Assignment;
+namespace ParkAir___Assignment.External;
 
 public static class AnsiConsole
 {

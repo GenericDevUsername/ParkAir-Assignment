@@ -1,4 +1,5 @@
-﻿using ParkAir___Assignment.Menus;
+﻿using System.Text;
+using ParkAir___Assignment.Menus;
 using System.Text.RegularExpressions;
 
 namespace ParkAir___Assignment;
@@ -237,46 +238,60 @@ public class Gui
   /// <returns>string tab list</returns>
   private string GenerateTabs(Gui gui)
   {
-    string tabTop = "";
-    string tabMiddle = "";
-    string tabBottom = "";
+    StringBuilder tabTop = new StringBuilder();
+    StringBuilder tabMiddle = new StringBuilder();
+    StringBuilder tabBottom = new StringBuilder();
 
     if (gui.Tabs.Count > 1)
     {
-      tabTop += "┌";
-      tabMiddle += "│";
-      tabBottom += "├";
+      tabTop.Append("┌");
+      tabMiddle.Append("│");
+      tabBottom.Append("├");
       foreach (ITab tab in Tabs)
       {
-        tabTop += $"{new string('─', tab.TabName.Length + 4)}{(tab == Tabs[^1] ? "┐" : "┬")}";
-        tabMiddle += $" {(Tabs[_tabIndex] == tab ? $"{(Tabs[_tabIndex].Tabber ? "[" : "\x1b[90m[\x1b[0m")}" : " ")}{tab.TabName}{(Tabs[_tabIndex] == tab ? $"{(Tabs[_tabIndex].Tabber ? "]" : "\x1b[90m]\x1b[0m")}" : " ")} │";
-        tabBottom += $"{new string('─', tab.TabName.Length + 4)}┴";
+        tabTop.Append($"{new string('─', tab.TabName.Length + 4)}{(tab == Tabs[^1] ? "┐" : "┬")}");
+        tabMiddle.Append($" {(Tabs[_tabIndex] == tab ? $"{(Tabs[_tabIndex].Tabber ? "[" : "\x1b[90m[\x1b[0m")}" : " ")}{tab.TabName}{(Tabs[_tabIndex] == tab ? $"{(Tabs[_tabIndex].Tabber ? "]" : "\x1b[90m]\x1b[0m")}" : " ")} │");
+        tabBottom.Append($"{new string('─', tab.TabName.Length + 4)}┴");
 
         if (tab == Tabs[Tabs.Count - 1 < 0 ? 0 : Tabs.Count - 1] && tabBottom.Length - (Tabs[_tabIndex].Tabber ? 0 : 9) < 92)
         {
           int lineCount = 92 - tabBottom.Length < 0 ? 0 : 92 - tabBottom.Length;
-          tabBottom = $"{tabBottom.Remove(tabBottom.Length - 1, 1)}{new string('─', lineCount)}┐";
-          char[] lineThreeArray = tabBottom.ToCharArray();
+          string bottomString = tabBottom.ToString();
+          tabBottom.Clear();
+          tabBottom.Append($"{bottomString.Remove(bottomString.Length - 1, 1)}{new string('─', lineCount)}┐");
+          char[] lineThreeArray = tabBottom.ToString().ToCharArray();
           lineThreeArray[tabMiddle.Length - (Tabs[_tabIndex].Tabber ? 0 : 18) - 1] = '┴';
-          tabBottom = new string(lineThreeArray);
+          tabBottom.Clear();
+          tabBottom.Append(string.Join("", lineThreeArray));
         }
         else if (tab == Tabs[Tabs.Count - 1 < 0 ? 0 : Tabs.Count - 1] && tabBottom.Length - (Tabs[_tabIndex].Tabber ? 0 : 9) == 92)
         {
-          tabBottom = $"{tabBottom.Remove(tabBottom.Length - 1, 1)}┤";
+          StringBuilder tempBuilder = new StringBuilder();
+          tempBuilder.Append(tabBottom.ToString());
+          
+          tabBottom.Clear();
+          tabBottom.Append($"{tempBuilder.Remove(tempBuilder.Length - 1, 1)}┤");
         }
         else if (tab == Tabs[Tabs.Count - 1 < 0 ? 0 : Tabs.Count - 1] && tabBottom.Length - (Tabs[_tabIndex].Tabber ? 0 : 9) > 92)
         {
-          tabBottom = $"{tabBottom.Remove(tabBottom.Length - 1, 1)}┘";
-          char[] lineThreeArray = tabBottom.ToCharArray();
-          char[] lineTwoArray = tabMiddle.ToCharArray();
+          StringBuilder tempBuilder = new StringBuilder();
+          tempBuilder.Append(tabBottom.ToString());
+          
+          tabBottom.Clear();
+          tabBottom.Append($"{tempBuilder.Remove(tempBuilder.Length - 1, 1)}┘");
+          char[] lineThreeArray = tabBottom.ToString().ToCharArray();
+          char[] lineTwoArray = tabMiddle.ToString().ToCharArray();
           lineThreeArray[91] = lineTwoArray[Tabs[_tabIndex].Tabber ? 91 : 96] == '│' ? '┼' : '┬';
-          tabBottom = new string(lineThreeArray);
+
+          tabBottom.Clear();
+          tabBottom.Append(string.Join("", lineThreeArray));
         }
       }
     }
     else
     {
-      tabBottom = $"┌{new string('─', 90)}┐";
+      tabBottom.Clear();
+      tabBottom.Append($"┌{new string('─', 90)}┐");
     }
 
 
@@ -288,8 +303,14 @@ public class Gui
   /// </summary>
   internal void ScreenUpdate()
   {
-
-    Console.Title = $"{(_menuTitle is not null ? $"{_menuTitle} - " : "")}{Tabs[_tabIndex].TabName}";
+    try
+    {
+      Console.Title = $"{(_menuTitle is not null ? $"{_menuTitle} - " : "")}{Tabs[_tabIndex].TabName}";
+    }
+    catch
+    {
+      return;
+    }
     string tabs = GenerateTabs(this);
     string screen = $"{tabs}\n{Tabs[_tabIndex].Screen()}";
     List<string> screenLines = screen.Split("\n").ToList();

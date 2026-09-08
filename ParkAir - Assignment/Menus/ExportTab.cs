@@ -10,6 +10,16 @@ public class ExportTab : ITab
   public bool Restart { get; } = false;
   public Gui? _gui { get; private set; }
   public bool Tabber { get; } = true;
+  
+  
+  private readonly Dictionary<int, string> _filetypes = new()
+  {
+    { 0, "TXT" },
+    { 1, "CSV" },
+  };
+  private int _fileType = 0;
+  
+  
   public void HandleKeypress(ConsoleKeyInfo key)
   {
 

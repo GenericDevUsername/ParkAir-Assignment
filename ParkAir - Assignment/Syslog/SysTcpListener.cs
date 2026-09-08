@@ -59,7 +59,7 @@ namespace ParkAir___Assignment.Syslog
           byte[] data = new byte[200];
           int size = client.Receive(data);
           string returnData = Encoding.ASCII.GetString(data);
-          this._server._log.Add(new SysMessage(returnData.Replace("\n", "")));
+          this._server.LogAppend(new SysMessage(returnData.Replace("\n", "")));
         }
         catch (Exception e)
         {

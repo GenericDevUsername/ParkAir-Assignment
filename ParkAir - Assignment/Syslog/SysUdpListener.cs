@@ -38,7 +38,7 @@ internal class SysUdpListener
       string returnData = Encoding.ASCII.GetString(received);
 
 
-      _server._log.Add(new SysMessage(returnData));
+      _server.LogAppend(new SysMessage(returnData));
 
       _udpClientListener.BeginReceive(Recv, null);
     }

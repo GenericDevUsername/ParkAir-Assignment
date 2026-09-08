@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Linq;
 using ParkAir___Assignment.Menus;
 using System.Text;
+using ParkAir___Assignment.Menus.ExportHandlers;
 
 namespace ParkAir___Assignment;
 
@@ -12,11 +13,12 @@ internal static class Program
   /// </summary>
   private static void Main()
   {
+    
     Console.WriteLine("Initialising...");
 
     ///// INITIALIZE CONSOLE FOR UTF-8 & ANSI SUPPORT /////
     Console.OutputEncoding = Encoding.UTF8;
-    AnsiConsole.Initialize();
+    External.AnsiConsole.Initialize();
 
     // get current working directory
     string dir = Directory.GetCurrentDirectory();
@@ -31,6 +33,7 @@ internal static class Program
 
     // start the menu background thread
     menuHandler.Start();
+    Console.Clear();
   }
 
   /// <summary>
@@ -40,9 +43,10 @@ internal static class Program
   /// <returns>settingsTab - a settingsTab Object.</returns>
   private static SettingsTab InitSettings(string fp)
   {
-    ///// SETUP SETTINGS MENU REQUIREMENTS /////
+    // SETUP SETTINGS MENU REQUIREMENTS.
 
-    if (!File.Exists(fp)) // if the settings file doesn't exist create it with default values
+    // if the settings file doesn't exist create it with default values.
+    if (!File.Exists(fp)) 
     {
       Console.WriteLine("Generating Settings File...");
       DefaultSettingsFile(fp);
