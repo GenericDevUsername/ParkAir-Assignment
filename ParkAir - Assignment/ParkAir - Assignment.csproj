@@ -9,11 +9,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.3"/>
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="Menus\SyslogHandlers\"/>
+        <Folder Include="Menus\SyslogHandlers\" />
+        <Folder Include="Syslog\NewFolder\" />
     </ItemGroup>
 
 </Project>

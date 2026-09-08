@@ -2,27 +2,27 @@
 
 public class SyslogTab : ITab
 {
-    public string TabName { get; set; } = "Syslog";
-    public string ScreenString => "";
-    public bool Tabber => true;
-    public Gui? _gui { get; private set; }
+  public string TabName { get; set; } = "Syslog";
+  public string ScreenString => "";
+  public bool Tabber => true;
+  public Gui? _gui { get; private set; }
 
-    public SyslogTab(SettingsTab settings)
-    {
-        
-    }
+  public SyslogTab(SettingsTab settings)
+  {
 
-    public void HandleKeypress(ConsoleKeyInfo key)
-    {
-    }
+  }
 
-    public string Screen()
-    {
-        return "";
-    }
+  public void HandleKeypress(ConsoleKeyInfo key)
+  {
+  }
 
-    public void Register(Gui gui)
-    {
-        _gui = gui;
-    }
+  public string Screen()
+  {
+    return "";
+  }
+
+  public void Register(Gui gui)
+  {
+    _gui = gui;
+  }
 }

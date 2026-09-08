@@ -1,220 +1,220 @@
-﻿using System.Text.RegularExpressions;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using ParkAir___Assignment.Menus.SettingsHandlers;
+using System.Text.RegularExpressions;
 
 namespace ParkAir___Assignment.Menus;
 
 public class SettingsTab : ITab
 {
-    private int _resetter;
-    private readonly List<Setting> _selectionIndex = new();
-    private readonly List<SettingsCategory> _settings = new();
+  private int _resetter;
+  private readonly List<Setting> _selectionIndex = new();
+  private readonly List<SettingsCategory> _settings = new();
 
-    public readonly string SettingsFile;
+  public readonly string SettingsFile;
 
-    public SettingsTab(string fp)
+  public SettingsTab(string fp)
+  {
+    SettingsFile = fp;
+    StreamReader file = File.OpenText(fp);
+    JsonTextReader reader = new(file);
+    Settings = (JObject)JToken.ReadFrom(reader);
+    file.Close();
+    BuildSettings();
+  }
+
+  private int CurrentIndex { get; set; } = -1;
+  public JObject Settings { get; }
+  public string TabName { get; set; } = "Settings";
+  public string ScreenString { get; } = "";
+  public bool Tabber { get; private set; } = true;
+  public Gui? _gui { get; private set; }
+
+  public void Register(Gui gui)
+  {
+    _gui = gui;
+  }
+
+  public void HandleKeypress(ConsoleKeyInfo key)
+  {
+    if (CurrentIndex < _selectionIndex.Count && _resetter > 0) _resetter = 0;
+    switch (key.Key)
     {
-        SettingsFile = fp;
-        StreamReader file = File.OpenText(fp);
-        JsonTextReader reader = new(file);
-        Settings = (JObject)JToken.ReadFrom(reader);
-        file.Close();
-        BuildSettings();
-    }
+      case ConsoleKey.DownArrow:
+        CurrentIndex = CurrentIndex + 1 == _selectionIndex.Count + 1 ? CurrentIndex : CurrentIndex + 1;
+        break;
 
-    private int CurrentIndex { get; set; } = -1;
-    public JObject Settings { get; }
-    public string TabName { get; set; } = "Settings";
-    public string ScreenString { get; } = "";
-    public bool Tabber { get; private set; } = true;
-    public Gui? _gui { get; private set; }
+      case ConsoleKey.UpArrow:
+        CurrentIndex = CurrentIndex - 1 == -2 ? CurrentIndex : CurrentIndex - 1;
+        break;
 
-    public void Register(Gui gui)
-    {
-        _gui = gui;
-    }
-
-    public void HandleKeypress(ConsoleKeyInfo key)
-    {
-        if (CurrentIndex < _selectionIndex.Count && _resetter > 0) _resetter = 0;
-        switch (key.Key)
+      case ConsoleKey.Enter:
+        if (CurrentIndex >= 0 && CurrentIndex < _selectionIndex.Count)
+          ChangeSetting(_selectionIndex[CurrentIndex], key);
+        if (CurrentIndex >= _selectionIndex.Count && _resetter > 0)
         {
-            case ConsoleKey.DownArrow:
-                CurrentIndex = CurrentIndex + 1 == _selectionIndex.Count + 1 ? CurrentIndex : CurrentIndex + 1;
-                break;
-
-            case ConsoleKey.UpArrow:
-                CurrentIndex = CurrentIndex - 1 == -2 ? CurrentIndex : CurrentIndex - 1;
-                break;
-
-            case ConsoleKey.Enter:
-                if (CurrentIndex >= 0 && CurrentIndex < _selectionIndex.Count)
-                    ChangeSetting(_selectionIndex[CurrentIndex], key);
-                if (CurrentIndex >= _selectionIndex.Count && _resetter > 0)
-                {
-                    _resetter++;
-                    if (_resetter == 3)
-                    {
-                        ResetToDefaults();
-                        _resetter = 0;
-                    }
-                }
-                else if (CurrentIndex >= _selectionIndex.Count)
-                {
-                    _resetter++;
-                }
-
-                break;
-
-            case ConsoleKey.RightArrow:
-                if (CurrentIndex >= 0 && CurrentIndex < _selectionIndex.Count)
-                    ChangeSetting(_selectionIndex[CurrentIndex], key);
-                break;
-
-            case ConsoleKey.LeftArrow:
-                if (CurrentIndex >= 0 && CurrentIndex < _selectionIndex.Count)
-                    ChangeSetting(_selectionIndex[CurrentIndex], key);
-                break;
+          _resetter++;
+          if (_resetter == 3)
+          {
+            ResetToDefaults();
+            _resetter = 0;
+          }
+        }
+        else if (CurrentIndex >= _selectionIndex.Count)
+        {
+          _resetter++;
         }
 
-        Tabber = CurrentIndex < 0;
+        break;
+
+      case ConsoleKey.RightArrow:
+        if (CurrentIndex >= 0 && CurrentIndex < _selectionIndex.Count)
+          ChangeSetting(_selectionIndex[CurrentIndex], key);
+        break;
+
+      case ConsoleKey.LeftArrow:
+        if (CurrentIndex >= 0 && CurrentIndex < _selectionIndex.Count)
+          ChangeSetting(_selectionIndex[CurrentIndex], key);
+        break;
     }
 
-    public string Screen()
+    Tabber = CurrentIndex < 0;
+  }
+
+  public string Screen()
+  {
+    List<string> screenLines = new();
+    int line = _gui is { Tabs.Count: > 1 } ? 3 : 1;
+    foreach (SettingsCategory category in _settings)
     {
-        List<string> screenLines = new();
-        int line = _gui is { Tabs.Count: > 1 } ? 3 : 1;
-        foreach (SettingsCategory category in _settings)
-        {
-            screenLines.Add($"│{category.Name}:{new string(' ', 89 - category.Name.Length)}│");
-            foreach (Setting setting in category.Settings)
-            {
-                line++;
-                screenLines.Add(SettingString(setting));
-                setting.Line = line;
-            }
+      screenLines.Add($"│{category.Name}:{new string(' ', 89 - category.Name.Length)}│");
+      foreach (Setting setting in category.Settings)
+      {
+        line++;
+        screenLines.Add(SettingString(setting));
+        setting.Line = line;
+      }
 
-            screenLines.Add($"│{new string(' ', 90)}│");
-        }
-
-        screenLines.Add(
-            $"│[{(CurrentIndex == _selectionIndex.Count ? ">" : " ")}] Reset to Defaults {(CurrentIndex == _selectionIndex.Count ? _resetter > 0 ? $"\x1b[31m(Press Enter {3 - _resetter} More Time(s) to Confirm)\x1b[0m" : "(Press Enter)" : " ")}{new string(' ', 85 - 18 - (CurrentIndex == _selectionIndex.Count ? _resetter > 0 ? 38 : 12 : 0))}│");
-
-        screenLines.Add($"└{new string('─', 90)}┘");
-
-        return string.Join("\n", screenLines.ToArray());
+      screenLines.Add($"│{new string(' ', 90)}│");
     }
 
-    private int Mod(int k, int n)
+    screenLines.Add(
+        $"│[{(CurrentIndex == _selectionIndex.Count ? ">" : " ")}] Reset to Defaults {(CurrentIndex == _selectionIndex.Count ? _resetter > 0 ? $"\x1b[31m(Press Enter {3 - _resetter} More Time(s) to Confirm)\x1b[0m" : "(Press Enter)" : " ")}{new string(' ', 85 - 18 - (CurrentIndex == _selectionIndex.Count ? _resetter > 0 ? 38 : 12 : 0))}│");
+
+    screenLines.Add($"└{new string('─', 90)}┘");
+
+    return string.Join("\n", screenLines.ToArray());
+  }
+
+  private int Mod(int k, int n)
+  {
+    return (k %= n) < 0 ? k + n : k;
+  }
+
+  private void BuildSettings()
+  {
+    foreach (KeyValuePair<string, JToken?> category in Settings)
     {
-        return (k %= n) < 0 ? k + n : k;
+      if (category.Value is null) continue;
+      if (category.Key == "FirstLaunch" || category.Value.Type != JTokenType.Object) continue;
+      BuildCategory(category.Key, category.Value);
     }
+  }
 
-    private void BuildSettings()
+  private void BuildCategory(string name, JToken settings)
+  {
+    SettingsCategory builtCategory = new(name, this);
+    foreach (KeyValuePair<string, JToken?> setting in settings.Value<JObject>()!)
     {
-        foreach (KeyValuePair<string, JToken?> category in Settings)
-        {
-            if (category.Value is null) continue;
-            if (category.Key == "FirstLaunch" || category.Value.Type != JTokenType.Object) continue;
-            BuildCategory(category.Key, category.Value);
-        }
+      Setting settingClass = new(builtCategory, setting, _selectionIndex.Count);
+      builtCategory.Settings.Add(settingClass);
+      _selectionIndex.Add(settingClass);
     }
 
-    private void BuildCategory(string name, JToken settings)
+    _settings.Add(builtCategory);
+  }
+
+  private void ChangeSetting(Setting setting, ConsoleKeyInfo ctx)
+  {
+    switch (setting.InputType)
     {
-        SettingsCategory builtCategory = new(name, this);
-        foreach (KeyValuePair<string, JToken?> setting in settings.Value<JObject>()!)
-        {
-            Setting settingClass = new(builtCategory, setting, _selectionIndex.Count);
-            builtCategory.Settings.Add(settingClass);
-            _selectionIndex.Add(settingClass);
-        }
+      case "Color":
+        // Get The Next Value
+        if (ctx.Key == ConsoleKey.Enter || ctx.Key == ConsoleKey.RightArrow)
+          setting.Set(new Color().Next((string)setting.Value["Selected"]));
+        else if (ctx.Key == ConsoleKey.LeftArrow)
+          setting.Set(new Color().Previous((string)setting.Value["Selected"]));
+        break;
 
-        _settings.Add(builtCategory);
+      case "SingleSelect":
+        string response = (string)setting.Value["Selected"];
+        List<string> indexArray = setting.Value.SelectToken("Options").ToObject<string[]>().ToList();
+        int currentIndex = indexArray.IndexOf(response);
+        // Get The Next Value
+        if ((ctx.Key == ConsoleKey.Enter || ctx.Key == ConsoleKey.RightArrow) && currentIndex > -1)
+          setting.Set(indexArray[Mod(currentIndex + 1, indexArray.Count)]);
+        else if (ctx.Key == ConsoleKey.LeftArrow && currentIndex > -1)
+          setting.Set(indexArray[Mod(currentIndex - 1, indexArray.Count)]);
+        break;
+
+      case "IP":
+        string newIp = _gui.Input(top: setting.Line, left: 64, prefill: (string)setting.Value["Selected"],
+            spaceholder: '_', max: 26, length: 26, customError: "Not a valid IP!",
+            regexCheck: new Regex(
+                @"^(((([lL]ocal[hH]ost)|(([2]([0-4][0-9]|[5][0-5])|[0-1]?[0-9]?[0-9])[.]){3}(([2]([0-4][0-9]|[5][0-5])|[0-1]?[0-9]?[0-9]))))+)$"));
+        setting.Set(newIp);
+        break;
+
+      case "Port":
+        string newPort = _gui.Input(top: setting.Line, left: 64, prefill: (string)setting.Value["Selected"],
+            spaceholder: '_', max: 5, length: 26, customError: "Use valid port (0 - 65535)!",
+            regexCheck: new Regex(
+                @"^([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$"));
+        setting.Set(newPort);
+        break;
     }
+  }
 
-    private void ChangeSetting(Setting setting, ConsoleKeyInfo ctx)
+  private void ResetToDefaults()
+  {
+    foreach (Setting setting in _selectionIndex) setting.Reset();
+  }
+
+  private string SettingString(Setting setting)
+  {
+    string valueDisplay = "";
+    int offset = 0;
+    string settingType = (string)setting.Value["InputType"];
+    switch (settingType)
     {
-        switch (setting.InputType)
-        {
-            case "Color":
-                // Get The Next Value
-                if (ctx.Key == ConsoleKey.Enter || ctx.Key == ConsoleKey.RightArrow)
-                    setting.Set(new Color().Next((string)setting.Value["Selected"]));
-                else if (ctx.Key == ConsoleKey.LeftArrow)
-                    setting.Set(new Color().Previous((string)setting.Value["Selected"]));
-                break;
+      case "SingleSelect":
+        JArray options = (JArray)setting.Value["Options"];
+        valueDisplay = "";
+        foreach (string option in options)
+          valueDisplay +=
+              $"[{((string)setting.Value["Selected"] == option ? "X" : " ")}] {option}{new string(' ', (int)setting.Value["OptionGap"])}";
+        valueDisplay = valueDisplay.Remove(valueDisplay.Length - (int)setting.Value["OptionGap"],
+            (int)setting.Value["OptionGap"]);
+        break;
 
-            case "SingleSelect":
-                string response = (string)setting.Value["Selected"];
-                List<string> indexArray = setting.Value.SelectToken("Options").ToObject<string[]>().ToList();
-                int currentIndex = indexArray.IndexOf(response);
-                // Get The Next Value
-                if ((ctx.Key == ConsoleKey.Enter || ctx.Key == ConsoleKey.RightArrow) && currentIndex > -1)
-                    setting.Set(indexArray[Mod(currentIndex + 1, indexArray.Count)]);
-                else if (ctx.Key == ConsoleKey.LeftArrow && currentIndex > -1)
-                    setting.Set(indexArray[Mod(currentIndex - 1, indexArray.Count)]);
-                break;
+      case "IP":
+        valueDisplay =
+            $"{(string?)setting.Value["Selected"]}{new string('_', 26 - ((string?)setting.Value["Selected"]).Length)}";
+        break;
 
-            case "IP":
-                string newIp = _gui.Input(top: setting.Line, left: 64, prefill: (string)setting.Value["Selected"],
-                    spaceholder: '_', max: 26, length: 26, customError: "Not a valid IP!",
-                    regexCheck: new Regex(
-                        @"^(((([lL]ocal[hH]ost)|(([2]([0-4][0-9]|[5][0-5])|[0-1]?[0-9]?[0-9])[.]){3}(([2]([0-4][0-9]|[5][0-5])|[0-1]?[0-9]?[0-9]))))+)$"));
-                setting.Set(newIp);
-                break;
+      case "Port":
+        valueDisplay =
+            $"{(string?)setting.Value["Selected"]}{new string('_', 26 - ((string?)setting.Value["Selected"]).Length)}";
+        break;
 
-            case "Port":
-                string newPort = _gui.Input(top: setting.Line, left: 64, prefill: (string)setting.Value["Selected"],
-                    spaceholder: '_', max: 5, length: 26, customError: "Use valid port (0 - 65535)!",
-                    regexCheck: new Regex(
-                        @"^([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$"));
-                setting.Set(newPort);
-                break;
-        }
+      case "Color":
+        valueDisplay =
+            $"{(string?)setting.Value["Selected"]}{new string(' ', 21 - ((string?)setting.Value["Selected"]).Length)}[{new Color().FromSetting((string?)setting.Value["Selected"])}▓▓▓\x1b[0m]";
+        offset += new Color().FromSetting((string?)setting.Value["Selected"]).Length + 4;
+        break;
     }
 
-    private void ResetToDefaults()
-    {
-        foreach (Setting setting in _selectionIndex) setting.Reset();
-    }
-
-    private string SettingString(Setting setting)
-    {
-        string valueDisplay = "";
-        int offset = 0;
-        string settingType = (string)setting.Value["InputType"];
-        switch (settingType)
-        {
-            case "SingleSelect":
-                JArray options = (JArray)setting.Value["Options"];
-                valueDisplay = "";
-                foreach (string option in options)
-                    valueDisplay +=
-                        $"[{((string)setting.Value["Selected"] == option ? "X" : " ")}] {option}{new string(' ', (int)setting.Value["OptionGap"])}";
-                valueDisplay = valueDisplay.Remove(valueDisplay.Length - (int)setting.Value["OptionGap"],
-                    (int)setting.Value["OptionGap"]);
-                break;
-
-            case "IP":
-                valueDisplay =
-                    $"{(string?)setting.Value["Selected"]}{new string('_', 26 - ((string?)setting.Value["Selected"]).Length)}";
-                break;
-
-            case "Port":
-                valueDisplay =
-                    $"{(string?)setting.Value["Selected"]}{new string('_', 26 - ((string?)setting.Value["Selected"]).Length)}";
-                break;
-
-            case "Color":
-                valueDisplay =
-                    $"{(string?)setting.Value["Selected"]}{new string(' ', 21 - ((string?)setting.Value["Selected"]).Length)}[{new Color().FromSetting((string?)setting.Value["Selected"])}▓▓▓\x1b[0m]";
-                offset += new Color().FromSetting((string?)setting.Value["Selected"]).Length + 4;
-                break;
-        }
-
-        return
-            $"│[{(CurrentIndex >= 0 ? (CurrentIndex < 0 || CurrentIndex > _selectionIndex.Count ? 0 : CurrentIndex) >= 0 && (CurrentIndex < 0 || CurrentIndex > _selectionIndex.Count ? 0 : CurrentIndex) < _selectionIndex.Count && _selectionIndex[CurrentIndex < 0 || CurrentIndex > _selectionIndex.Count ? 0 : CurrentIndex] == setting ? ">" : " " : " ")}] {setting.Name}{new string(' ', 85 - setting.Name.Length - valueDisplay.Length + offset)}{valueDisplay} │";
-    }
+    return
+        $"│[{(CurrentIndex >= 0 ? (CurrentIndex < 0 || CurrentIndex > _selectionIndex.Count ? 0 : CurrentIndex) >= 0 && (CurrentIndex < 0 || CurrentIndex > _selectionIndex.Count ? 0 : CurrentIndex) < _selectionIndex.Count && _selectionIndex[CurrentIndex < 0 || CurrentIndex > _selectionIndex.Count ? 0 : CurrentIndex] == setting ? ">" : " " : " ")}] {setting.Name}{new string(' ', 85 - setting.Name.Length - valueDisplay.Length + offset)}{valueDisplay} │";
+  }
 }
