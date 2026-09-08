@@ -54,7 +54,7 @@ namespace ParkAir___Assignment.Menus.SettingsHandlers
     public string? FromSetting(string value)
     {
       string? response = null;
-      if (this._colors.ContainsKey(value)) response = this._colors[value];
+      if (this._colors.TryGetValue(value, out var color)) response = color;
       return response;
     }
   }

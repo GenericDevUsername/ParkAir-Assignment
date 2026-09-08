@@ -9,6 +9,7 @@ namespace ParkAir___Assignment
     private static void Main()
     {
       Console.OutputEncoding = Encoding.UTF8;
+      AnsiConsole.Initialize();
 
       Console.WriteLine("Initialising...");
       var dir = Directory.GetCurrentDirectory();
@@ -19,10 +20,7 @@ namespace ParkAir___Assignment
       menuHandler.AddTab(InitSettings($"{dir}/settings.json"));
       menuHandler.AddTab(InitSettings($"{dir}/settings.json"));
       menuHandler.AddTab(InitSettings($"{dir}/settings.json"));
-
-      Console.
-
-
+      
       menuHandler.Start();
       while (true)
       {

@@ -1,6 +1,5 @@
 ﻿using ParkAir___Assignment.Menus;
 using System.Text.RegularExpressions;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace ParkAir___Assignment
 {
